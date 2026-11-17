@@ -15,6 +15,13 @@
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/admin.css">
+
+  <!-- Autenticação Médica e Guarda de Rota -->
+  <script src="js/auth.js"></script>
+  <script>
+    // Protege o painel: redireciona para login.html se não houver sessão ativa
+    AuthService.protectPage();
+  </script>
 </head>
 <body class="admin-body">
 
@@ -74,8 +81,8 @@
       <a href="index.html" class="btn btn-sm btn-outline" style="width: 100%; justify-content: center;">
         🌐 Ver Site Público
       </a>
-      <button class="admin-logout-btn" onclick="showToast('Sessão médica encerrada.', 'info'); setTimeout(()=>window.location.href='index.html', 1000);">
-        🔒 Bloquear Painel
+      <button class="admin-logout-btn" onclick="AuthService.logout()">
+        🔒 Encerrar Sessão Médica
       </button>
     </div>
   </aside>
@@ -92,8 +99,11 @@
       </div>
 
       <div class="admin-header-actions">
+        <span class="admin-badge-session" id="adminSessionBadge" title="Sessão médica criptografada e autenticada">
+          <span style="display: inline-block; width: 7px; height: 7px; background-color: var(--admin-success); border-radius: 50%; box-shadow: 0 0 6px var(--admin-success);"></span>
+          Sessão Médica Conectada
+        </span>
         <span class="admin-badge-usf">
-          <span style="display: inline-block; width: 7px; height: 7px; background-color: var(--admin-success); border-radius: 50%;"></span>
           USF Luana Freitas (ESF II)
         </span>
         <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Alternar modo escuro/claro">
