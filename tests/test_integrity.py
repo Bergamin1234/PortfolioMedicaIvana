@@ -12,6 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def test_files_exist():
     required_files = [
         'index.html',
+        'admin.html',
         'README.md',
         'LICENSE',
         'robots.txt',
@@ -20,7 +21,9 @@ def test_files_exist():
         'css/styles.css',
         'css/components.css',
         'css/responsive.css',
+        'css/admin.css',
         'js/main.js',
+        'js/admin.js',
         'js/scheduling.js',
         'js/calculators.js',
         'js/publications.js',
@@ -28,6 +31,7 @@ def test_files_exist():
         'js/triage-intake.js',
         'js/exams-guide.js',
         'assets/img/avatar-doctor.svg',
+        'assets/img/logo-crest.svg',
         'assets/img/crm-badge.svg',
         'assets/img/medical-hero.svg',
         'assets/img/favicon.svg',

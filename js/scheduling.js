@@ -163,6 +163,25 @@ function renderStep(step) {
   } else if (step === 4) {
     // Tela de confirmação e sucesso
     appointmentState.confirmationCode = 'MED-' + Math.floor(100000 + Math.random() * 900000);
+
+    // Sincroniza em tempo real com o Painel Administrativo
+    try {
+      let currentAppts = JSON.parse(localStorage.getItem('dra_ivana_appointments') || '[]');
+      currentAppts.unshift({
+        id: appointmentState.confirmationCode,
+        patientName: appointmentState.patientName,
+        patientPhone: appointmentState.patientPhone,
+        patientCpf: appointmentState.patientCpf,
+        date: appointmentState.date,
+        time: appointmentState.time,
+        modality: appointmentState.modalityName,
+        reason: appointmentState.patientReason,
+        status: "Pendente",
+        notes: "Agendado pelo portal público do paciente."
+      });
+      localStorage.setItem('dra_ivana_appointments', JSON.stringify(currentAppts));
+    } catch(e) {}
+
     const whatsappText = encodeURIComponent(
       `Olá, gostaria de confirmar o agendamento de consulta com a Dra. Ivana Bergamin:\n` +
       `Código: ${appointmentState.confirmationCode}\n` +

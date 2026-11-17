@@ -71,7 +71,18 @@ O sistema integra a narrativa humanizada de sua trajetória de vida e formação
 - Showcase educativo com posts ilustrativos sobre saúde da mulher, hematologia na prática clínica, hipertensão, diabetes e medicina preventiva.
 - Botão direto para conexão e engajamento no Instagram da profissional.
 
-### 7. Conformidade com a Resolução CFM nº 2.336/2023
+### 7. Painel Administrativo Clínico Exclusivo (`admin.html`)
+- **Dashboard de Gestão & KPIs:** Indicadores de consultas agendadas, confirmadas, pendentes e distribuição por unidade (USF Luana Freitas, consultório, telemedicina e domiciliar).
+- **Agenda Integrada em Tempo Real:** Sincronização automática com os agendamentos realizados no site público através do `localStorage`.
+- **Prontuário Eletrônico do Paciente (Método SOAP):**
+  - **S (Subjetivo):** Queixa e história clínica.
+  - **O (Objetivo):** Sinais vitais com cálculo automático de IMC.
+  - **A (Avaliação):** Diagnóstico no padrão CIAP-2 / CID-10 da Medicina de Família.
+  - **P (Plano):** Conduta terapêutica e exames laboratoriais complementares.
+- **Emissão de Receituário Timbrado Oficial:** Geração de documento médico timbrado pronto para impressão com CRM/AC 3484.
+- **Gestão de Triagens & Red Flags:** Visualização rápida de sintomas de alarme dos pacientes.
+
+### 8. Conformidade com a Resolução CFM nº 2.336/2023
 - Total alinhamento com as normas de publicidade médica do Conselho Federal de Medicina.
 - Identificação visível de CRM/AC 3484, RQE / programa de residência médica, caráter educativo dos conteúdos e ausência de promessas de cura.
 
@@ -82,12 +93,15 @@ O sistema integra a narrativa humanizada de sua trajetória de vida e formação
 ```
 PortfolioMedicaIvana/
 ├── index.html                  # Landing page principal completa
+├── admin.html                  # Painel médico administrativo e prontuário SOAP
 ├── css/
 │   ├── styles.css              # Design system, variáveis, tema dark/light
 │   ├── components.css          # Botões, cards, wizard, timeline, modais
-│   └── responsive.css          # Layout fluido, mobile drawer e acessibilidade
+│   ├── responsive.css          # Layout fluido, mobile drawer e acessibilidade
+│   └── admin.css               # Estilos da sidebar, tabelas de agenda e PEP SOAP
 ├── js/
 │   ├── main.js                 # Controlador geral, alternador de tema e FAQ
+│   ├── admin.js                # Lógica do painel administrativo, SOAP e receitas
 │   ├── scheduling.js           # Agendador inteligente e gerador de .ICS
 │   ├── calculators.js          # Calculadoras clínicas (IMC, Gestacional, FINDRISC, eGFR)
 │   ├── publications.js         # Biblioteca científica e gerador de citações
@@ -97,6 +111,7 @@ PortfolioMedicaIvana/
 ├── assets/
 │   ├── img/
 │   │   ├── avatar-doctor.svg   # Retrato vetorial da Dra. Ivana
+│   │   ├── logo-crest.svg      # Brasão clínico com monograma IB
 │   │   ├── medical-hero.svg    # Ilustração de medicina e diagnóstico laboratorial
 │   │   ├── crm-badge.svg       # Selo de verificação oficial CRM/AC 3484
 │   │   └── favicon.svg         # Favicon clínico
