@@ -80,24 +80,24 @@
       <nav aria-label="Navegação principal">
         <ul class="nav-menu" id="navMenu">
           <li><a href="#inicio" class="nav-link active">Início</a></li>
-          <li><a href="#sobre" class="nav-link">Sobre Mim</a></li>
-          <li><a href="#atuacao" class="nav-link">Áreas de Atuação</a></li>
-          <li><a href="#publicacoes" class="nav-link">Produção Científica</a></li>
+          <li><a href="#sobre" class="nav-link">Sobre</a></li>
+          <li><a href="#atuacao" class="nav-link">Atuação</a></li>
+          <li><a href="#publicacoes" class="nav-link">Pesquisa</a></li>
           <li><a href="#agendamento" class="nav-link">Agendamento</a></li>
           <li><a href="#calculadoras" class="nav-link">Calculadoras</a></li>
-          <li><a href="#exames" class="nav-link">Guia de Exames</a></li>
+          <li><a href="#exames" class="nav-link">Exames</a></li>
           <li><a href="#instagram" class="nav-link">Instagram</a></li>
-          <li><a href="#contato" class="nav-link">Onde Atendo</a></li>
+          <li><a href="#contato" class="nav-link">Locais</a></li>
         </ul>
       </nav>
 
       <div class="nav-actions">
-        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Alternar modo escuro/claro">
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Alternar modo escuro/claro" title="Alternar Modo Escuro / Claro">
           🌙
         </button>
         <a href="#agendamento" class="header-cta-btn">
           <span>📅</span>
-          <span>Agendar Consulta</span>
+          <span>Agendar</span>
         </a>
         <button class="menu-toggle-btn" id="menuToggleBtn" aria-label="Abrir menu de navegação" aria-expanded="false">
           ☰
@@ -156,20 +156,8 @@
           </div>
 
           <div class="hero-visual-wrapper">
-            <div class="doctor-portrait-frame">
-              <div class="doctor-portrait-inner">
-                <img src="assets/img/doctor-portrait.jpg" alt="Dra. Ivana Caroline Silva Bergamin - Médica de Família e Comunidade" class="doctor-real-photo" id="doctorHeroPhoto">
-                <div class="doctor-photo-overlay"></div>
-                <div class="doctor-verified-badge">
-                  <div class="doctor-verified-text">
-                    <span class="doctor-verified-title">Dra. Ivana Bergamin</span>
-                    <span class="doctor-verified-crm">CRM/AC 3484 • Medicina de Família (MFC)</span>
-                  </div>
-                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; border-radius: 50%; color: #10b981; font-size: 0.85rem; font-weight: bold;" title="Registro Ativo no CRM-AC">
-                    ✓
-                  </span>
-                </div>
-              </div>
+            <div class="hero-avatar-frame">
+              <img src="assets/img/avatar-doctor.svg" alt="Dra. Ivana Caroline Silva Bergamin - Médica de Família e Comunidade" class="hero-main-avatar" id="doctorHeroAvatar">
             </div>
             
             <div class="floating-badge floating-badge-top">
@@ -229,8 +217,63 @@
             </p>
           </div>
 
-          <div>
-            <img src="assets/img/medical-hero.svg" alt="Ilustração de Medicina e Diagnóstico" style="width: 100%; max-width: 460px; margin: 0 auto;">
+          <div class="clinical-showcase-card">
+            <div class="clinical-showcase-header">
+              <span class="clinical-pulse-dot"></span>
+              <span class="clinical-showcase-title">Raciocínio Clínico Integrado</span>
+            </div>
+
+            <!-- Monitor ECG / Sinais Vitais com Traçado Dinâmico -->
+            <div class="ecg-monitor-box">
+              <div class="ecg-screen-header">
+                <span class="ecg-badge">ECG • RITMO SINUSAL 72 BPM</span>
+                <span class="ecg-badge">SpO2 99% • ESTÁVEL</span>
+              </div>
+              <svg class="ecg-svg" viewBox="0 0 500 110" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="ecgGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#0284c7" />
+                    <stop offset="45%" stop-color="#38bdf8" />
+                    <stop offset="55%" stop-color="#2dd4bf" />
+                    <stop offset="100%" stop-color="#0d9488" />
+                  </linearGradient>
+                </defs>
+                <!-- Linhas de grade de monitor cardíaco -->
+                <line x1="0" y1="28" x2="500" y2="28" stroke="rgba(56, 189, 248, 0.12)" stroke-width="1" stroke-dasharray="4 4" />
+                <line x1="0" y1="55" x2="500" y2="55" stroke="rgba(56, 189, 248, 0.18)" stroke-width="1" />
+                <line x1="0" y1="82" x2="500" y2="82" stroke="rgba(56, 189, 248, 0.12)" stroke-width="1" stroke-dasharray="4 4" />
+                <!-- Traçado cardíaco P-Q-R-S-T preciso -->
+                <path d="M 0 55 L 45 55 Q 55 50 65 55 L 85 55 L 92 59 L 102 16 L 112 92 L 120 52 L 130 55 Q 148 42 168 55 L 245 55 Q 255 50 265 55 L 285 55 L 292 59 L 302 16 L 312 92 L 320 52 L 330 55 Q 348 42 368 55 L 500 55" 
+                      fill="none" stroke="url(#ecgGlow)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" class="ecg-pulse-anim" />
+              </svg>
+            </div>
+
+            <!-- Grid de Pilares Clínicos da Dra. Ivana -->
+            <div class="clinical-pillars-grid">
+              <div class="pillar-mini-card">
+                <div class="pillar-mini-icon">🔬</div>
+                <div>
+                  <h4 class="pillar-mini-title">Biomedicina Diagnóstica</h4>
+                  <p class="pillar-mini-text">4 anos de formação em hematologia, imunologia e micologia hospitalar crítica.</p>
+                </div>
+              </div>
+
+              <div class="pillar-mini-card">
+                <div class="pillar-mini-icon">🩺</div>
+                <div>
+                  <h4 class="pillar-mini-title">Medicina de Família & Mulher</h4>
+                  <p class="pillar-mini-text">Residência COREME/FUNDHACRE 2025 e Vice-Presidência da LIMAGO na Uninorte.</p>
+                </div>
+              </div>
+
+              <div class="pillar-mini-card">
+                <div class="pillar-mini-icon">📚</div>
+                <div>
+                  <h4 class="pillar-mini-title">Pesquisa Científica BJHR</h4>
+                  <p class="pillar-mini-text">Autora de comparativo cirúrgico em ginecologia no Brazilian Journal of Health Review (2025).</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
