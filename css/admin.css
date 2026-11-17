@@ -1,0 +1,464 @@
+/* ==========================================================================
+   DRA. IVANA CAROLINE SILVA BERGAMIN | PAINEL ADMINISTRATIVO MÉDICO
+   Estilos dedicados para Sidebar, Dashboard, Prontuário Eletrônico e Agenda
+   ========================================================================== */
+
+:root {
+  --sidebar-width: 270px;
+  --admin-header-height: 70px;
+  --admin-bg: #090e1a;
+  --admin-surface: #111a2e;
+  --admin-surface-card: #16223b;
+  --admin-border: #1f3052;
+  --admin-text-main: #f8fafc;
+  --admin-text-muted: #94a3b8;
+  --admin-accent: #0284c7;
+  --admin-accent-glow: rgba(2, 132, 199, 0.25);
+  --admin-teal: #0d9488;
+  --admin-success: #10b981;
+  --admin-warning: #f59e0b;
+  --admin-danger: #ef4444;
+}
+
+[data-theme="light"] {
+  --admin-bg: #f1f5f9;
+  --admin-surface: #ffffff;
+  --admin-surface-card: #ffffff;
+  --admin-border: #e2e8f0;
+  --admin-text-main: #0f172a;
+  --admin-text-muted: #64748b;
+  --admin-accent-glow: rgba(2, 132, 199, 0.15);
+}
+
+.admin-body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--admin-bg);
+  color: var(--admin-text-main);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   SIDEBAR LATERAL
+   ========================================================================== */
+.admin-sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--admin-surface);
+  border-right: 1px solid var(--admin-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+.admin-sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.admin-brand-crest {
+  width: 42px;
+  height: 42px;
+}
+
+.admin-sidebar-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--admin-text-main);
+  line-height: 1.15;
+}
+
+.admin-sidebar-crm {
+  font-size: 0.75rem;
+  color: var(--admin-accent);
+  font-weight: 700;
+}
+
+.admin-nav-list {
+  list-style: none;
+  padding: 1.25rem 0.85rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.admin-nav-item button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--admin-text-muted);
+  font-size: 0.925rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.admin-nav-item button:hover {
+  background-color: rgba(2, 132, 199, 0.08);
+  color: var(--admin-accent);
+  border-color: rgba(2, 132, 199, 0.2);
+}
+
+.admin-nav-item.active button {
+  background: linear-gradient(135deg, var(--admin-accent) 0%, var(--admin-teal) 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px var(--admin-accent-glow);
+}
+
+.admin-nav-badge {
+  margin-left: auto;
+  background-color: var(--admin-danger);
+  color: #ffffff;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 800;
+}
+
+.admin-sidebar-footer {
+  padding: 1.25rem;
+  border-top: 1px solid var(--admin-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.admin-logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem;
+  background: none;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+  color: var(--admin-danger);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: var(--admin-danger);
+}
+
+/* ==========================================================================
+   CONTEÚDO PRINCIPAL (MAIN WRAPPER)
+   ========================================================================== */
+.admin-main-wrapper {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.admin-top-header {
+  height: var(--admin-header-height);
+  background-color: var(--admin-surface);
+  border-bottom: 1px solid var(--admin-border);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.admin-header-greeting h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--admin-text-main);
+}
+
+.admin-header-greeting p {
+  font-size: 0.825rem;
+  color: var(--admin-text-muted);
+  margin: 0.15rem 0 0 0;
+}
+
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-badge-usf {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  background-color: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--admin-success);
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.admin-content-area {
+  padding: 2.25rem;
+  flex: 1;
+}
+
+.admin-view-tab {
+  display: none;
+  animation: adminFade 0.25s ease;
+}
+
+.admin-view-tab.active {
+  display: block;
+}
+
+@keyframes adminFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   CARDS DE KPIS / MÉTRICAS
+   ========================================================================== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.25rem;
+}
+
+.kpi-card {
+  background-color: var(--admin-surface-card);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--admin-accent);
+}
+
+.kpi-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.kpi-blue {
+  background-color: rgba(2, 132, 199, 0.15);
+  color: var(--admin-accent);
+  border: 1px solid rgba(2, 132, 199, 0.3);
+}
+
+.kpi-teal {
+  background-color: rgba(13, 148, 136, 0.15);
+  color: var(--admin-teal);
+  border: 1px solid rgba(13, 148, 136, 0.3);
+}
+
+.kpi-amber {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: var(--admin-warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.kpi-rose {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--admin-danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.kpi-val {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: var(--admin-text-main);
+  line-height: 1.1;
+}
+
+.kpi-label {
+  font-size: 0.825rem;
+  color: var(--admin-text-muted);
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+/* ==========================================================================
+   TABELAS DE DADOS
+   ========================================================================== */
+.admin-table-card {
+  background-color: var(--admin-surface-card);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+}
+
+.admin-table-header {
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.admin-table-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--admin-text-main);
+  margin: 0;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.admin-table th {
+  background-color: rgba(0, 0, 0, 0.12);
+  color: var(--admin-text-muted);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.775rem;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table td {
+  padding: 1.15rem 1.5rem;
+  border-bottom: 1px solid var(--admin-border);
+  color: var(--admin-text-main);
+  vertical-align: middle;
+}
+
+.admin-table tr:hover td {
+  background-color: rgba(2, 132, 199, 0.03);
+}
+
+/* Badges de Status Clínico */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.status-confirmada {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: var(--admin-success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-pendente {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: var(--admin-warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-concluida {
+  background-color: rgba(2, 132, 199, 0.15);
+  color: var(--admin-accent);
+  border: 1px solid rgba(2, 132, 199, 0.3);
+}
+
+.status-urgente {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--admin-danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  animation: pulseDot 1.5s infinite;
+}
+
+/* ==========================================================================
+   PRONTUÁRIO SOAP & RECEITUÁRIO TIMBRADO
+   ========================================================================== */
+.soap-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.soap-box {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+
+.soap-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+}
+
+.soap-s { color: #38bdf8; }
+.soap-o { color: #2dd4bf; }
+.soap-a { color: #f59e0b; }
+.soap-p { color: #10b981; }
+
+/* Receituário Oficial para Impressão */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-prescription, .printable-prescription * {
+    visibility: visible;
+  }
+  .printable-prescription {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 2cm;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+}
