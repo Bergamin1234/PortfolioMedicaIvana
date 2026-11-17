@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bergamin1234.github.io/portfolio-dra-ivana-bergamin/sitemap.xml
