@@ -31,18 +31,45 @@
 <body>
 
   <!-- ==========================================================================
-       HEADER & NAVEGAÇÃO PRINCIPAL
+       TOPBAR CLÍNICA & CONTATO
+       ========================================================================== -->
+  <div class="site-topbar">
+    <div class="container topbar-wrapper">
+      <div class="topbar-info">
+        <span class="topbar-item">
+          <span class="dot"></span>
+          <span>Atendimento Ativo em Rio Branco – AC</span>
+        </span>
+        <span class="topbar-item">
+          🏥 USF Luana Freitas & Rede Hospitalar
+        </span>
+      </div>
+      <div class="topbar-links">
+        <a href="https://api.whatsapp.com/send?phone=5568999999999" class="topbar-link" target="_blank" rel="noopener noreferrer">
+          📱 WhatsApp: (68) 99999-9999
+        </a>
+        <span style="opacity: 0.4;">|</span>
+        <span style="color: #bae6fd;">CRM/AC 3484 • RQE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       HEADER & NAVEGAÇÃO PRINCIPAL DE ALTO PADRÃO
        ========================================================================== -->
   <header class="site-header">
     <div class="container nav-wrapper">
       <a href="#inicio" class="brand-link" aria-label="Página Inicial - Dra. Ivana Bergamin">
-        <img src="assets/img/favicon.svg" alt="Ícone Médico Dra. Ivana" class="brand-logo">
+        <img src="assets/img/logo-crest.svg" alt="Monograma Médico Dra. Ivana" class="brand-crest">
         <div class="brand-info">
           <span class="brand-name">Dra. Ivana Bergamin</span>
-          <span class="brand-crm">
-            <span style="display: inline-block; width: 6px; height: 6px; background-color: var(--success); border-radius: 50%;"></span>
-            CRM/AC 3484 • MFC
-          </span>
+          <div class="brand-badge-row">
+            <span class="brand-crm-tag">
+              <span style="display: inline-block; width: 6px; height: 6px; background-color: var(--success); border-radius: 50%;"></span>
+              CRM/AC 3484
+            </span>
+            <span class="brand-status-text">MFC • COREME</span>
+          </div>
         </div>
       </a>
 
@@ -64,8 +91,9 @@
         <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Alternar modo escuro/claro">
           🌙
         </button>
-        <a href="#agendamento" class="btn btn-primary btn-sm" style="display: none; @media(min-width: 900px){display: inline-flex;}">
-          Agendar Consulta
+        <a href="#agendamento" class="header-cta-btn">
+          <span>📅</span>
+          <span>Agendar Consulta</span>
         </a>
         <button class="menu-toggle-btn" id="menuToggleBtn" aria-label="Abrir menu de navegação" aria-expanded="false">
           ☰
@@ -124,21 +152,21 @@
           </div>
 
           <div class="hero-visual-wrapper">
-            <img src="assets/img/avatar-doctor.svg" alt="Ilustração Médica da Dra. Ivana Bergamin" class="hero-main-avatar">
+            <img src="assets/img/avatar-doctor.svg" alt="Retrato Médico da Dra. Ivana Bergamin" class="hero-main-avatar">
             
             <div class="floating-badge floating-badge-top">
-              <span style="font-size: 1.5rem;">🩺</span>
+              <div class="floating-badge-icon icon-cyan">🩺</div>
               <div>
-                <strong style="font-size: 0.85rem; color: var(--text-main); display: block;">MFC • COREME</strong>
-                <span style="font-size: 0.75rem; color: var(--text-muted);">Residência Médica FUNDHACRE</span>
+                <strong class="floating-badge-title">MFC • COREME</strong>
+                <span class="floating-badge-sub">Residência Médica FUNDHACRE</span>
               </div>
             </div>
 
             <div class="floating-badge floating-badge-bottom">
-              <span style="font-size: 1.5rem;">🔬</span>
+              <div class="floating-badge-icon icon-teal">🔬</div>
               <div>
-                <strong style="font-size: 0.85rem; color: var(--text-main); display: block;">Visão Laboratorial</strong>
-                <span style="font-size: 0.75rem; color: var(--text-muted);">Biomédica & Pesquisadora</span>
+                <strong class="floating-badge-title">Visão Laboratorial</strong>
+                <span class="floating-badge-sub">Biomédica & Pesquisadora</span>
               </div>
             </div>
           </div>
