@@ -301,7 +301,7 @@ button, input, select, textarea {
   position: sticky;
   top: 0;
   z-index: 1000;
-  height: var(--header-height);
+  height: 68px;
   background-color: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -309,9 +309,15 @@ button, input, select, textarea {
   transition: all var(--transition-normal);
 }
 
+.site-header .container {
+  max-width: 1440px;
+  padding: 0 1.25rem;
+  height: 100%;
+}
+
 .site-header.scrolled {
   box-shadow: var(--shadow-lg);
-  height: 74px;
+  height: 64px;
 }
 
 .nav-wrapper {
@@ -319,20 +325,24 @@ button, input, select, textarea {
   align-items: center;
   justify-content: space-between;
   height: 100%;
+  gap: 1rem;
 }
 
 /* Logo & Monograma Clínico */
 .brand-link {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  text-decoration: none;
 }
 
 .brand-crest {
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
   transition: transform var(--transition-normal);
   filter: drop-shadow(0 4px 10px rgba(2, 132, 199, 0.25));
+  flex-shrink: 0;
 }
 
 .brand-link:hover .brand-crest {
@@ -342,33 +352,37 @@ button, input, select, textarea {
 .brand-info {
   display: flex;
   flex-direction: column;
+  white-space: nowrap !important;
 }
 
 .brand-name {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 900;
   color: var(--text-main);
   letter-spacing: -0.025em;
   line-height: 1.15;
+  white-space: nowrap !important;
 }
 
 .brand-badge-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.2rem;
+  gap: 0.4rem;
+  margin-top: 0.15rem;
+  white-space: nowrap !important;
 }
 
 .brand-crm-tag {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 800;
   color: var(--primary-600);
   background: var(--primary-100);
-  padding: 0.15rem 0.55rem;
+  padding: 0.1rem 0.45rem;
   border-radius: var(--radius-full);
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.25rem;
+  white-space: nowrap !important;
 }
 
 [data-theme="dark"] .brand-crm-tag {
@@ -377,25 +391,32 @@ button, input, select, textarea {
 }
 
 .brand-status-text {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   font-weight: 600;
+  white-space: nowrap !important;
 }
 
-/* Menu de Navegação */
+/* Menu de Navegação - Sem quebra de linha (white-space: nowrap) */
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.35rem;
   list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-wrap: nowrap !important;
 }
 
 .nav-link {
-  font-size: 0.925rem;
+  font-size: 0.84rem;
   font-weight: 700;
   color: var(--text-secondary);
-  padding: 0.5rem 0.5rem;
+  padding: 0.45rem 0.65rem;
   position: relative;
+  white-space: nowrap !important;
+  display: inline-block;
+  line-height: 1.2;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
 }
@@ -403,11 +424,11 @@ button, input, select, textarea {
 .nav-link::after {
   content: '';
   position: absolute;
-  bottom: -4px;
+  bottom: 0px;
   left: 50%;
   transform: translateX(-50%);
   width: 0%;
-  height: 3px;
+  height: 2.5px;
   background: linear-gradient(90deg, var(--primary-500), var(--teal-400));
   transition: width var(--transition-normal);
   border-radius: var(--radius-full);
@@ -415,21 +436,24 @@ button, input, select, textarea {
 
 .nav-link:hover, .nav-link.active {
   color: var(--primary-600);
+  background: rgba(2, 132, 199, 0.08);
 }
 
 [data-theme="dark"] .nav-link:hover, [data-theme="dark"] .nav-link.active {
   color: var(--primary-400);
+  background: rgba(56, 189, 248, 0.12);
 }
 
 .nav-link:hover::after, .nav-link.active::after {
-  width: 80%;
+  width: 70%;
 }
 
 /* Ações do Header (Tema e CTA) */
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.65rem;
+  flex-shrink: 0;
 }
 
 .theme-toggle-btn {
@@ -437,15 +461,16 @@ button, input, select, textarea {
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   cursor: pointer;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   transition: all var(--transition-fast);
   box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
 }
 
 .theme-toggle-btn:hover {
@@ -458,9 +483,9 @@ button, input, select, textarea {
 .header-cta-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1.35rem;
-  font-size: 0.9rem;
+  gap: 0.4rem;
+  padding: 0.55rem 1.15rem;
+  font-size: 0.85rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--primary-600) 0%, var(--teal-700) 100%);
   color: #ffffff;
@@ -468,6 +493,8 @@ button, input, select, textarea {
   box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
   transition: all var(--transition-normal);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  white-space: nowrap !important;
+  flex-shrink: 0;
 }
 
 .header-cta-btn:hover {
@@ -481,8 +508,9 @@ button, input, select, textarea {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   color: var(--text-main);
-  padding: 0.5rem 0.75rem;
+  padding: 0.4rem 0.65rem;
   border-radius: var(--radius-md);
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   cursor: pointer;
+  flex-shrink: 0;
 }
