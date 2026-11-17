@@ -2,12 +2,12 @@
   <defs>
     <linearGradient id="favGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0284c7" />
-      <stop offset="100%" stop-color="#0f766e" />
+      <stop offset="50%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#0369a1" />
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="16" fill="url(#favGrad)" />
-  <!-- Medical Cross with Stethoscope motif -->
-  <path d="M32 14v36M14 32h36" stroke="#ffffff" stroke-width="6" stroke-linecap="round" />
-  <circle cx="32" cy="32" r="8" fill="#ffffff" opacity="0.9" />
-  <path d="M28 32l3 3 5-6" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <rect width="64" height="64" rx="18" fill="url(#favGrad)" />
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.6" />
+  <text x="32" y="42" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="24" font-weight="900" fill="#ffffff" letter-spacing="-1" text-anchor="middle">IB</text>
+  <circle cx="47" cy="19" r="3.5" fill="#2dd4bf" stroke="#ffffff" stroke-width="1.2" />
 </svg>

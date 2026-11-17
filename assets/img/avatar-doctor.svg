@@ -1,92 +1,194 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" width="500" height="560">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e0f2fe" />
-      <stop offset="50%" stop-color="#ccfbf1" />
-      <stop offset="100%" stop-color="#f0fdfa" />
+    <!-- Background Luxury Radial Glow -->
+    <radialGradient id="luxGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#0284c7" stop-opacity="0.35" />
+      <stop offset="45%" stop-color="#0d9488" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Aura Ring Gradients -->
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#2dd4bf" />
+      <stop offset="100%" stop-color="#0284c7" />
     </linearGradient>
-    <linearGradient id="coatGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="50%" stop-color="#eab308" />
+      <stop offset="100%" stop-color="#ca8a04" />
+    </linearGradient>
+
+    <!-- Lab Coat Realistic Shading -->
+    <linearGradient id="coatBody" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="100%" stop-color="#f1f5f9" />
+      <stop offset="70%" stop-color="#f1f5f9" />
+      <stop offset="100%" stop-color="#e2e8f0" />
     </linearGradient>
+
+    <linearGradient id="coatShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#cbd5e1" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </linearGradient>
+
+    <!-- Stethoscope Metallic Gradient -->
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#94a3b8" />
+      <stop offset="100%" stop-color="#475569" />
+    </linearGradient>
+
+    <!-- Hair Realistic Shading -->
+    <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2c1810" />
+      <stop offset="40%" stop-color="#1f110b" />
+      <stop offset="100%" stop-color="#120805" />
+    </linearGradient>
+
+    <linearGradient id="hairHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4a2c1f" />
+      <stop offset="50%" stop-color="#78442d" />
+      <stop offset="100%" stop-color="#4a2c1f" />
+    </linearGradient>
+
+    <!-- Skin Realistic Warm Tone -->
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fde8dc" />
+      <stop offset="50%" stop-color="#fcd8c5" />
+      <stop offset="100%" stop-color="#f5c2a8" />
+    </linearGradient>
+
+    <!-- Scrub Navy Cyan Gradient -->
     <linearGradient id="scrubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0284c7" />
       <stop offset="100%" stop-color="#0369a1" />
     </linearGradient>
-    <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#3e2723" />
-      <stop offset="100%" stop-color="#1a0c06" />
-    </linearGradient>
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.12" />
+
+    <!-- Drop Shadows -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000000" flood-opacity="0.35" />
     </filter>
   </defs>
 
-  <!-- Circular Background -->
-  <circle cx="200" cy="200" r="185" fill="url(#bgGrad)" stroke="#0284c7" stroke-width="4" stroke-opacity="0.3" />
-  
-  <!-- Subtle decorative rings -->
-  <circle cx="200" cy="200" r="160" fill="none" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.4" />
-  
-  <!-- Back Hair -->
-  <path d="M125 150 C110 230 115 310 135 340 C145 280 140 210 145 160 Z" fill="url(#hairGrad)" />
-  <path d="M275 150 C290 230 285 310 265 340 C255 280 260 210 255 160 Z" fill="url(#hairGrad)" />
+  <!-- Ambient Glow Behind -->
+  <circle cx="250" cy="240" r="220" fill="url(#luxGlow)" />
 
-  <!-- Body / Shoulders -->
-  <!-- Scrub under coat -->
-  <path d="M165 240 L235 240 L245 385 L155 385 Z" fill="url(#scrubGrad)" />
-  <!-- V-neck of scrub -->
-  <path d="M185 240 L200 270 L215 240 Z" fill="#f8fafc" />
+  <!-- Outer Glass Geometric Halo Ring -->
+  <circle cx="250" cy="240" r="195" fill="none" stroke="url(#ringGrad)" stroke-width="2.5" opacity="0.6" stroke-dasharray="12 8" />
+  <circle cx="250" cy="240" r="182" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
 
-  <!-- Lab Coat -->
-  <path d="M110 385 C110 300 135 245 170 235 L190 285 L155 385 Z" fill="url(#coatGrad)" filter="url(#shadow)" stroke="#cbd5e1" stroke-width="1.5" />
-  <path d="M290 385 C290 300 265 245 230 235 L210 285 L245 385 Z" fill="url(#coatGrad)" filter="url(#shadow)" stroke="#cbd5e1" stroke-width="1.5" />
-  
-  <!-- Coat Lapels -->
-  <path d="M170 235 L195 320 L160 320 Z" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
-  <path d="M230 235 L205 320 L240 320 Z" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <!-- Medical Cross Subtle Background Orbit -->
+  <g opacity="0.25" transform="translate(250, 240)">
+    <circle cx="0" cy="0" r="160" fill="none" stroke="#38bdf8" stroke-width="1" stroke-dasharray="4 12" />
+  </g>
 
-  <!-- Stethoscope -->
-  <!-- Tubing around neck -->
-  <path d="M150 250 C150 310 180 340 190 340 C195 340 200 335 200 325" fill="none" stroke="#334155" stroke-width="7" stroke-linecap="round" />
-  <path d="M250 250 C250 300 230 330 210 335" fill="none" stroke="#334155" stroke-width="7" stroke-linecap="round" />
-  <!-- Chestpiece -->
-  <circle cx="190" cy="342" r="14" fill="#94a3b8" stroke="#475569" stroke-width="3" />
-  <circle cx="190" cy="342" r="8" fill="#cbd5e1" />
+  <!-- ================= DOCTOR FIGURE ================= -->
 
-  <!-- Neck -->
-  <path d="M180 200 L180 245 C180 255 220 255 220 245 L220 200 Z" fill="#f7d0b5" />
+  <!-- Back Hair (Flowing Elegant Brunette) -->
+  <path d="M150 170 C130 260 140 380 165 420 C185 410 180 300 185 220 Z" fill="url(#hairGrad)" />
+  <path d="M350 170 C370 260 360 380 335 420 C315 410 320 300 315 220 Z" fill="url(#hairGrad)" />
 
-  <!-- Head / Face -->
-  <ellipse cx="200" cy="180" rx="55" ry="65" fill="#fcd7be" filter="url(#shadow)" />
+  <!-- Shoulders & Upper Body Silhouette -->
+  <!-- Scrub Base (V-neck medical uniform) -->
+  <path d="M190 280 L310 280 L330 520 L170 520 Z" fill="url(#scrubGrad)" />
+  <path d="M220 280 L250 330 L280 280 Z" fill="#e0f2fe" opacity="0.9" />
 
-  <!-- Eyes -->
-  <ellipse cx="180" cy="175" rx="6" ry="7" fill="#292524" />
-  <ellipse cx="220" cy="175" rx="6" ry="7" fill="#292524" />
-  <circle cx="178" cy="173" r="2" fill="#ffffff" />
-  <circle cx="218" cy="173" r="2" fill="#ffffff" />
+  <!-- Professional White Medical Lab Coat -->
+  <!-- Left Side Coat -->
+  <path d="M120 520 C120 400 155 315 200 290 L230 380 L185 520 Z" 
+        fill="url(#coatBody)" filter="url(#cardShadow)" />
+  <!-- Right Side Coat -->
+  <path d="M380 520 C380 400 345 315 300 290 L270 380 L315 520 Z" 
+        fill="url(#coatBody)" filter="url(#cardShadow)" />
 
-  <!-- Eyebrows (gentle, friendly curve) -->
-  <path d="M170 162 Q180 157 190 162" fill="none" stroke="#292524" stroke-width="3" stroke-linecap="round" />
-  <path d="M210 162 Q220 157 230 162" fill="none" stroke="#292524" stroke-width="3" stroke-linecap="round" />
+  <!-- Coat Collar & Lapels (Tailored Sharp Medical Cut) -->
+  <path d="M200 290 L235 390 L195 390 L165 310 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <path d="M300 290 L265 390 L305 390 L335 310 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
 
-  <!-- Nose -->
-  <path d="M200 178 Q203 190 197 193 Q203 195 204 193" fill="none" stroke="#e0a98b" stroke-width="2.5" stroke-linecap="round" />
-
-  <!-- Smile / Lips -->
-  <path d="M188 212 Q200 224 212 212" fill="none" stroke="#be185d" stroke-width="3.5" stroke-linecap="round" />
-  <!-- Rosy Cheeks -->
-  <circle cx="170" cy="192" r="9" fill="#f43f5e" opacity="0.18" />
-  <circle cx="230" cy="192" r="9" fill="#f43f5e" opacity="0.18" />
-
-  <!-- Hair (Front, Styled Brunette) -->
-  <path d="M145 170 C140 120 170 100 200 100 C235 100 260 120 255 170 C245 135 225 125 200 125 C175 125 155 135 145 170 Z" fill="url(#hairGrad)" />
-  <path d="M145 160 C155 130 185 130 195 140 C175 145 155 160 145 185 Z" fill="url(#hairGrad)" />
-  <path d="M255 160 C245 130 215 130 205 140 C225 145 245 160 255 185 Z" fill="url(#hairGrad)" />
+  <!-- Coat Center Line & Buttons -->
+  <line x1="250" y1="390" x2="250" y2="520" stroke="#cbd5e1" stroke-width="2" />
+  <circle cx="250" cy="425" r="5" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+  <circle cx="250" cy="475" r="5" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
 
   <!-- Doctor Badge on Left Chest -->
-  <rect x="235" y="295" width="38" height="24" rx="4" fill="#ffffff" stroke="#0284c7" stroke-width="1.5" />
-  <rect x="239" y="300" width="30" height="4" rx="2" fill="#0284c7" />
-  <rect x="239" y="307" width="22" height="3" rx="1.5" fill="#94a3b8" />
-  <rect x="239" y="312" width="16" height="2" rx="1" fill="#94a3b8" />
+  <g transform="translate(305, 360)">
+    <rect width="48" height="30" rx="6" fill="#ffffff" stroke="#0284c7" stroke-width="1.5" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.15))" />
+    <rect x="5" y="6" width="38" height="4" rx="2" fill="#0284c7" />
+    <rect x="5" y="14" width="28" height="3" rx="1.5" fill="#64748b" />
+    <rect x="5" y="20" width="20" height="3" rx="1.5" fill="#0d9488" />
+  </g>
+
+  <!-- Realistic Stethoscope -->
+  <!-- Stethoscope Binaural Tubes (around neck) -->
+  <path d="M195 285 C185 360 215 410 238 410 C246 410 250 400 250 385" 
+        fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round" />
+  <path d="M305 285 C315 350 285 400 262 405" 
+        fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round" />
+  <!-- Stethoscope Chestpiece (Dual-Head Stethoscope with Chrome Rim) -->
+  <circle cx="238" cy="415" r="18" fill="url(#metalGrad)" stroke="#1e293b" stroke-width="3" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.3))" />
+  <circle cx="238" cy="415" r="11" fill="#cbd5e1" stroke="#64748b" stroke-width="1.5" />
+  <circle cx="238" cy="415" r="4" fill="#38bdf8" />
+
+  <!-- Neck & Decolletage -->
+  <path d="M225 230 L225 295 C225 305 275 305 275 295 L275 230 Z" fill="url(#skinGrad)" />
+  <path d="M225 280 C240 295 260 295 275 280" fill="none" stroke="#e0a98b" stroke-width="2" opacity="0.6" />
+
+  <!-- Head & Facial Contour (Refined, Realistic Oval) -->
+  <path d="M190 180 C190 260 205 275 250 275 C295 275 310 260 310 180 C310 130 295 110 250 110 C205 110 190 130 190 180 Z" 
+        fill="url(#skinGrad)" filter="url(#cardShadow)" />
+
+  <!-- Elegant Eye Makeup, Brows and Lashes -->
+  <!-- Left Eyebrow (Arch, natural refined) -->
+  <path d="M210 162 Q 225 153 238 160" fill="none" stroke="#1f110b" stroke-width="3.5" stroke-linecap="round" />
+  <!-- Right Eyebrow -->
+  <path d="M262 160 Q 275 153 290 162" fill="none" stroke="#1f110b" stroke-width="3.5" stroke-linecap="round" />
+
+  <!-- Left Eye -->
+  <ellipse cx="225" cy="176" rx="10" ry="7" fill="#ffffff" />
+  <ellipse cx="226" cy="176" rx="6" ry="6" fill="#3e2723" />
+  <circle cx="227" cy="176" r="3.5" fill="#0f0704" />
+  <circle cx="224" cy="174" r="1.8" fill="#ffffff" />
+  <!-- Eyelash Liner -->
+  <path d="M214 175 Q 225 168 236 174" fill="none" stroke="#120805" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Right Eye -->
+  <ellipse cx="275" cy="176" rx="10" ry="7" fill="#ffffff" />
+  <ellipse cx="274" cy="176" rx="6" ry="6" fill="#3e2723" />
+  <circle cx="273" cy="176" r="3.5" fill="#0f0704" />
+  <circle cx="276" cy="174" r="1.8" fill="#ffffff" />
+  <!-- Eyelash Liner -->
+  <path d="M264 174 Q 275 168 286 175" fill="none" stroke="#120805" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Nose (Delicate Contour) -->
+  <path d="M250 174 L251 198 Q 251 204 246 205 Q 251 206 254 204" fill="none" stroke="#d49474" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Lips (Warm Rose Professional Smile) -->
+  <path d="M236 226 Q 250 236 264 226" fill="none" stroke="#be185d" stroke-width="3.5" stroke-linecap="round" />
+  <path d="M239 225 Q 250 220 261 225 Q 250 233 239 225 Z" fill="#e11d48" opacity="0.3" />
+
+  <!-- Natural Cheeks Blush -->
+  <ellipse cx="212" cy="195" rx="14" ry="9" fill="#f43f5e" opacity="0.14" />
+  <ellipse cx="288" cy="195" rx="14" ry="9" fill="#f43f5e" opacity="0.14" />
+
+  <!-- Front Hair Styling (Professional Long Waves, Shiny Highlights) -->
+  <!-- Top Volume -->
+  <path d="M185 160 C185 95 220 75 250 75 C280 75 315 95 315 160 C300 110 275 95 250 95 C225 95 200 110 185 160 Z" fill="url(#hairGrad)" />
+  <!-- Side Wave Left -->
+  <path d="M190 140 C175 180 180 230 195 260 C185 220 180 180 200 145 Z" fill="url(#hairHighlight)" />
+  <path d="M185 130 C170 190 170 270 190 310 C180 260 175 200 195 140 Z" fill="url(#hairGrad)" />
+  <!-- Side Wave Right -->
+  <path d="M310 140 C325 180 320 230 305 260 C315 220 320 180 300 145 Z" fill="url(#hairHighlight)" />
+  <path d="M315 130 C330 190 330 270 310 310 C320 260 325 200 305 140 Z" fill="url(#hairGrad)" />
+
+  <!-- Hair Gloss Highlights -->
+  <path d="M220 95 Q 250 85 280 95" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4" stroke-linecap="round" />
+
+  <!-- Bottom Elegant Glow Pedestal Line -->
+  <ellipse cx="250" cy="535" rx="180" ry="12" fill="url(#luxGlow)" />
 </svg>
