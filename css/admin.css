@@ -220,6 +220,19 @@
   font-weight: 700;
 }
 
+.admin-badge-session {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  background-color: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 .admin-content-area {
   padding: 2.25rem;
   flex: 1;

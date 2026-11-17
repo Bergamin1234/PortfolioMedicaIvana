@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Administrativo | Dra. Ivana Bergamin (CRM/AC 3484)</title>
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+  
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Estilos da Aplicação -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/admin.css">
+
+  <style>
+    .login-page-body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: radial-gradient(circle at 50% 20%, rgba(2, 132, 199, 0.15) 0%, rgba(9, 14, 26, 0.98) 70%);
+      background-color: var(--admin-bg, #090e1a);
+      color: var(--admin-text-main, #f8fafc);
+      padding: 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    [data-theme="light"] .login-page-body {
+      background: radial-gradient(circle at 50% 20%, rgba(2, 132, 199, 0.08) 0%, rgba(241, 245, 249, 0.95) 70%);
+      background-color: #f1f5f9;
+    }
+
+    /* Glow de Fundo */
+    .login-glow-bg {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.25) 0%, rgba(13, 148, 136, 0.15) 50%, transparent 80%);
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .login-navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+    }
+
+    .login-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--admin-text-muted);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all var(--transition-fast);
+    }
+
+    .login-back-link:hover {
+      color: var(--primary-400);
+      background: rgba(2, 132, 199, 0.12);
+      border-color: var(--primary-500);
+      transform: translateX(-3px);
+    }
+
+    .login-main-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      padding: 2rem 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .login-card {
+      background: var(--admin-surface, #111a2e);
+      border: 1px solid var(--admin-border, #1f3052);
+      border-radius: var(--radius-2xl, 24px);
+      padding: 2.75rem 2.5rem;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(56, 189, 248, 0.15);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0284c7, #0d9488, #38bdf8);
+    }
+
+    .login-header-group {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-crest-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 1.25rem;
+      filter: drop-shadow(0 6px 14px rgba(2, 132, 199, 0.35));
+    }
+
+    .login-shield-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(2, 132, 199, 0.15);
+      border: 1px solid rgba(2, 132, 199, 0.35);
+      color: #38bdf8;
+      font-size: 0.725rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      margin-bottom: 0.75rem;
+    }
+
+    .login-title {
+      font-size: 1.55rem;
+      font-weight: 900;
+      color: var(--admin-text-main);
+      margin: 0 0 0.45rem;
+      letter-spacing: -0.02em;
+    }
+
+    .login-subtitle {
+      font-size: 0.85rem;
+      color: var(--admin-text-muted);
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .input-field-wrapper {
+      position: relative;
+    }
+
+    .input-icon-left {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+      color: var(--admin-text-muted);
+      pointer-events: none;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.85rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--admin-border);
+      background: var(--admin-surface-card, #16223b);
+      color: var(--admin-text-main);
+      font-size: 0.925rem;
+      font-family: inherit;
+      transition: all var(--transition-fast);
+      box-sizing: border-box;
+    }
+
+    .login-input:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.2);
+      background: rgba(2, 132, 199, 0.05);
+    }
+
+    .toggle-pass-btn {
+      position: absolute;
+      right: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--admin-text-muted);
+      cursor: pointer;
+      font-size: 1.15rem;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toggle-pass-btn:hover {
+      color: #38bdf8;
+    }
+
+    .login-options-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.825rem;
+    }
+
+    .checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--admin-text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .forgot-link {
+      color: #38bdf8;
+      text-decoration: none;
+      font-weight: 700;
+      transition: color var(--transition-fast);
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+      color: #7dd3fc;
+    }
+
+    .btn-login-submit {
+      width: 100%;
+      padding: 0.95rem;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(2, 132, 199, 0.4);
+      transition: all var(--transition-normal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-login-submit:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #0f766e 100%);
+      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .btn-login-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Card de Demonstração Rápida */
+    .demo-credentials-box {
+      margin-top: 1.25rem;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px dashed rgba(56, 189, 248, 0.3);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .demo-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .demo-title {
+      font-size: 0.775rem;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .demo-fill-btn {
+      background: rgba(2, 132, 199, 0.25);
+      border: 1px solid #0284c7;
+      color: #f8fafc;
+      font-size: 0.725rem;
+      font-weight: 800;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .demo-fill-btn:hover {
+      background: #0284c7;
+      color: #ffffff;
+    }
+
+    .demo-credentials-text {
+      font-size: 0.75rem;
+      color: var(--admin-text-muted);
+      margin: 0;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .login-error-alert {
+      display: none;
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius-md);
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      font-size: 0.825rem;
+      font-weight: 600;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .login-footer-info {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--admin-text-muted);
+      max-width: 650px;
+      margin: 0 auto;
+      line-height: 1.5;
+      position: relative;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body class="login-page-body">
+
+  <div class="login-glow-bg"></div>
+
+  <!-- Top Navigation Bar -->
+  <nav class="login-navbar">
+    <a href="index.html" class="login-back-link">
+      <span>←</span>
+      <span>Voltar ao Portfólio Público</span>
+    </a>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Alternar tema">
+        🌙
+      </button>
+    </div>
+  </nav>
+
+  <!-- Login Card Principal -->
+  <main class="login-main-container">
+    <div class="login-card">
+      <div class="login-header-group">
+        <img src="assets/img/logo-crest.svg" alt="Monograma Dra. Ivana Bergamin" class="login-crest-icon">
+        <div>
+          <span class="login-shield-badge">
+            <span>🛡️</span>
+            <span>Acesso Médico Restrito</span>
+          </span>
+        </div>
+        <h1 class="login-title">Painel Administrativo</h1>
+        <p class="login-subtitle">
+          Dra. Ivana Caroline Silva Bergamin • CRM/AC 3484<br>
+          <span style="font-size: 0.775rem; color: #38bdf8;">Prontuário Eletrônico (SOAP) & Gestão Clínica</span>
+        </p>
+      </div>
+
+      <!-- Alerta de Erro -->
+      <div class="login-error-alert" id="loginErrorAlert">
+        <span>⚠️</span>
+        <span id="loginErrorMsg">Credenciais inválidas.</span>
+      </div>
+
+      <!-- Formulário de Login -->
+      <form class="login-form" id="adminLoginForm">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="loginUser">CRM / Identificação Médica</label>
+          <div class="input-field-wrapper">
+            <span class="input-icon-left">🩺</span>
+            <input type="text" id="loginUser" class="login-input" placeholder="CRM-AC 3484 ou ivana.bergamin" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="loginPassword">Senha de Segurança Clínica</label>
+          <div class="input-field-wrapper">
+            <span class="input-icon-left">🔒</span>
+            <input type="password" id="loginPassword" class="login-input" placeholder="••••••••••••" required autocomplete="current-password">
+            <button type="button" class="toggle-pass-btn" id="togglePasswordBtn" aria-label="Mostrar ou ocultar senha">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <div class="login-options-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="rememberMe" checked>
+            <span>Lembrar meu acesso</span>
+          </label>
+          <a href="#" class="forgot-link" id="forgotPassBtn">Esqueci a senha</a>
+        </div>
+
+        <button type="submit" class="btn-login-submit" id="submitLoginBtn">
+          <span>🔐</span>
+          <span>Entrar no Painel Médico</span>
+        </button>
+
+        <!-- Acesso Rápido de Demonstração -->
+        <div class="demo-credentials-box">
+          <div class="demo-title-row">
+            <span class="demo-title">⚡ Acesso Rápido (Demonstração)</span>
+            <button type="button" class="demo-fill-btn" id="fillDemoBtn">Preencher Dados</button>
+          </div>
+          <p class="demo-credentials-text">
+            <strong>Usuário:</strong> ivana.bergamin &nbsp;|&nbsp; <strong>Senha:</strong> medicina2025
+          </p>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Rodapé Institucional e Legal CFM -->
+  <footer class="login-footer-info">
+    <p style="margin-bottom: 0.25rem;">
+      Ambiente Restrito e Auditado • Conformidade com as <strong>Resoluções CFM nº 2.336/2023</strong> e <strong>CFM nº 2.299/2021</strong> (Prontuário Eletrônico).
+    </p>
+    <p style="margin: 0; opacity: 0.65;">
+      Proteção de Dados Médicos (LGPD - Lei nº 13.709/2018). Todos os acessos registram IP e carimbo de data/hora oficial.
+    </p>
+  </footer>
+
+  <!-- Script de Autenticação e Interatividade -->
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Se já estiver logado, redireciona diretamente para o painel
+      AuthService.redirectIfAuthenticated();
+
+      const loginForm = document.getElementById('adminLoginForm');
+      const userField = document.getElementById('loginUser');
+      const passField = document.getElementById('loginPassword');
+      const rememberCheckbox = document.getElementById('rememberMe');
+      const togglePassBtn = document.getElementById('togglePasswordBtn');
+      const errorAlert = document.getElementById('loginErrorAlert');
+      const errorMsg = document.getElementById('loginErrorMsg');
+      const submitBtn = document.getElementById('submitLoginBtn');
+      const fillDemoBtn = document.getElementById('fillDemoBtn');
+      const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+      // Alternador de tema claro/escuro
+      themeToggleBtn.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'dark';
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        themeToggleBtn.textContent = next === 'dark' ? '🌙' : '☀️';
+      });
+
+      // Alternar visibilidade de senha
+      togglePassBtn.addEventListener('click', () => {
+        const isPassword = passField.type === 'password';
+        passField.type = isPassword ? 'text' : 'password';
+        togglePassBtn.textContent = isPassword ? '🙈' : '👁️';
+      });
+
+      // Preencher credenciais de teste
+      fillDemoBtn.addEventListener('click', () => {
+        userField.value = 'ivana.bergamin';
+        passField.value = 'medicina2025';
+        errorAlert.style.display = 'none';
+        userField.focus();
+      });
+
+      // Processar Login
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        errorAlert.style.display = 'none';
+
+        const user = userField.value;
+        const pass = passField.value;
+        const remember = rememberCheckbox.checked;
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>⏳</span><span>Autenticando sessão médica...</span>';
+
+        setTimeout(() => {
+          const result = AuthService.login(user, pass, remember);
+
+          if (result.success) {
+            submitBtn.innerHTML = '<span>✓</span><span>Acesso Autorizado! Redirecionando...</span>';
+            submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+
+            const params = new URLSearchParams(window.location.search);
+            const returnUrl = params.get('returnUrl') || 'admin.html';
+
+            setTimeout(() => {
+              window.location.href = returnUrl;
+            }, 800);
+          } else {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>🔐</span><span>Entrar no Painel Médico</span>';
+            errorMsg.textContent = result.message;
+            errorAlert.style.display = 'flex';
+            passField.value = '';
+            passField.focus();
+          }
+        }, 600);
+      });
+
+      // Esqueci a senha
+      document.getElementById('forgotPassBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('Recuperação de Senha Médica:\n\nPara redefinir o acesso institucional, entre em contato com a Secretaria da Residência Médica (COREME/FUNDHACRE) ou utilize o canal institucional com certificação digital ICP-Brasil.');
+      });
+    });
+  </script>
+</body>
+</html>
