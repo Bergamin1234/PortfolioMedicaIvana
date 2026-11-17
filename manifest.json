@@ -1,0 +1,17 @@
+{
+  "name": "Dra. Ivana Caroline Silva Bergamin | CRM/AC 3484",
+  "short_name": "Dra. Ivana Bergamin",
+  "description": "Portfólio médico oficial, agendamento de consultas e calculadoras clínicas.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1120",
+  "theme_color": "#0284c7",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "assets/img/favicon.svg",
+      "sizes": "64x64 128x128 256x256",
+      "type": "image/svg+xml"
+    }
+  ]
+}
