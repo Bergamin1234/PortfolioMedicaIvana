@@ -30,6 +30,7 @@ def test_files_exist():
         'js/instagram-feed.js',
         'js/triage-intake.js',
         'js/exams-guide.js',
+        'assets/img/doctor-portrait.jpg',
         'assets/img/avatar-doctor.svg',
         'assets/img/logo-crest.svg',
         'assets/img/crm-badge.svg',
