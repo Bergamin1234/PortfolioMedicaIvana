@@ -1,465 +1,842 @@
 /**
- * Dra. Ivana Caroline Silva Bergamin - Painel Administrativo Clínico
- * Prontuário SOAP, Gestão de Agenda, Faturamento SUS e Emissão de Receitas Timbradas
+ * Dra. Ivana Caroline Silva Bergamin - Painel Médico Administrativo
+ * Central de Mensagem Rápida (WhatsApp), Retornos, Dia Marcado, Agenda & Prontuário SOAP
  */
 
-// Dados iniciais de demonstração para a prática clínica da Dra. Ivana
+const DEFAULT_DOCTOR_CONFIG = {
+  phone: '+55 69 9383-7333',
+  signature: 'Dra. Ivana Bergamin • Médica (CRM/AC 3484)',
+  hoursMorning: '07:30 às 12:00 (Seg a Sex)',
+  hoursAfternoon: '14:00 às 18:00 (Seg a Sex)'
+};
+
+function getFutureISODate(daysAhead) {
+  const d = new Date();
+  d.setDate(d.getDate() + daysAhead);
+  return d.toISOString().split('T')[0];
+}
+
+function isoToBRDate(iso) {
+  if (!iso) return '';
+  if (iso.includes('/')) return iso;
+  const parts = iso.split('-');
+  if (parts.length !== 3) return iso;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+function brToISODate(br) {
+  if (!br) return getFutureISODate(1);
+  if (br.includes('-')) return br;
+  const parts = br.split('/');
+  if (parts.length !== 3) return getFutureISODate(1);
+  return `${parts[2]}-${parts[1]}-${parts[0]}`;
+}
+
+function normalizeWhatsAppDigits(raw) {
+  const digits = String(raw || '').replace(/\D/g, '');
+  if (!digits) return '';
+  if (digits.startsWith('55') && digits.length >= 12) return digits;
+  return '55' + digits;
+}
+
 const DEFAULT_APPOINTMENTS = [
   {
-    id: "MED-908231",
-    patientName: "Maria Raimunda de Souza",
-    patientPhone: "(68) 99234-8877",
-    patientCpf: "123.456.789-00",
-    date: "18/11/2026",
-    time: "08:30",
-    modality: "USF Luana Freitas (SUS)",
-    reason: "Acompanhamento de Hipertensão e Diabetes",
-    status: "Confirmada",
-    notes: "Paciente em uso de Losartana 50mg e Metformina 850mg. Trazer exames recentes de creatinina e microalbuminúria."
+    id: 'MED-908231',
+    patientName: 'Maria Raimunda de Souza',
+    patientPhone: '(69) 9383-7333',
+    date: isoToBRDate(getFutureISODate(1)),
+    time: '08:30',
+    modality: 'USF Luana Freitas (ESF II)',
+    reason: 'Retorno para acompanhamento de Hipertensão e exames laboratoriais.',
+    status: 'Retorno Marcado',
+    notes: 'Trazer exames recentes de creatinina, glicemia e lista de medicações.'
   },
   {
-    id: "MED-908232",
-    patientName: "Sebastião Ferreira da Silva",
-    patientPhone: "(68) 99876-1122",
-    patientCpf: "234.567.890-11",
-    date: "18/11/2026",
-    time: "09:15",
-    modality: "USF Luana Freitas (SUS)",
-    reason: "Avaliação de Exames Laboratoriais",
-    status: "Pendente",
-    notes: "Colheu hemograma completo e perfil lipídico na semana passada."
+    id: 'MED-908232',
+    patientName: 'Sebastião Ferreira da Silva',
+    patientPhone: '(68) 99876-1122',
+    date: isoToBRDate(getFutureISODate(1)),
+    time: '09:30',
+    modality: 'USF Luana Freitas (ESF II)',
+    reason: 'Avaliação de Hemograma e Perfil Lipídico.',
+    status: 'Pendente',
+    notes: 'Confirmar se já buscou o resultado dos exames no laboratório.'
   },
   {
-    id: "MED-908233",
-    patientName: "Francisca das Chagas Lima",
-    patientPhone: "(68) 98412-3344",
-    patientCpf: "345.678.901-22",
-    date: "18/11/2026",
-    time: "10:00",
-    modality: "Consultório Clínico / Check-up",
-    reason: "Saúde da Mulher / Preventivo Ginecológico",
-    status: "Confirmada",
-    notes: "Coleta de preventivo (Papanicolau) de rotina e solicitação de mamografia bilateral."
+    id: 'MED-908233',
+    patientName: 'Francisca das Chagas Lima',
+    patientPhone: '(68) 98412-3344',
+    date: isoToBRDate(getFutureISODate(2)),
+    time: '10:00',
+    modality: 'Consultório Clínico',
+    reason: 'Saúde da Mulher / Preventivo e check-up anual.',
+    status: 'Confirmada',
+    notes: 'Trazer ultrassonografia e mamografia anterior.'
   },
   {
-    id: "MED-908234",
-    patientName: "Antônio Carlos Albuquerque",
-    patientPhone: "(68) 99112-9988",
-    patientCpf: "456.789.012-33",
-    date: "19/11/2026",
-    time: "14:00",
-    modality: "Telemedicina",
-    reason: "Acolhimento em Saúde Mental / Ansiedade",
-    status: "Confirmada",
-    notes: "Quadro de insônia e ansiedade generalizada após sobrecarga de trabalho. Reavaliação clínica."
-  },
-  {
-    id: "MED-908235",
-    patientName: "Raimundo Nonato Pereira",
-    patientPhone: "(68) 99901-4455",
-    patientCpf: "567.890.123-44",
-    date: "19/11/2026",
-    time: "15:30",
-    modality: "Visita Domiciliar",
-    reason: "Acompanhamento do Idoso Acamado",
-    status: "Confirmada",
-    notes: "Sequela de AVC, paciente acamado em cuidados pela família na área da USF Luana Freitas."
+    id: 'MED-908234',
+    patientName: 'Antônio Carlos Albuquerque',
+    patientPhone: '(68) 99112-9988',
+    date: isoToBRDate(getFutureISODate(3)),
+    time: '14:30',
+    modality: 'Telemedicina (Online)',
+    reason: 'Retorno — Acompanhamento em Saúde Mental e ajuste de receita.',
+    status: 'Retorno Marcado',
+    notes: 'Enviar link da teleconsulta 15 minutos antes.'
   }
 ];
 
-let appointmentsList = [];
-let medicalRecords = [];
+const DEFAULT_SOAP_RECORDS = [
+  {
+    id: 'SOAP-001',
+    patientName: 'Maria Raimunda de Souza',
+    date: isoToBRDate(getFutureISODate(-14)),
+    s: 'Paciente refere cefaleia leve matinal ocasional. Relata uso regular de Losartana 50mg.',
+    o: 'PA: 132/82 mmHg | FC: 74 bpm | SatO2: 98% | Ausculta cardiopulmonar sem alterações.',
+    a: 'Hipertensão Arterial Sistêmica controlada em acompanhamento ambulatorial.',
+    p: 'Mantida Losartana 50mg 1x/dia. Solicitados exames de rotina. Retorno agendado em 15 dias.'
+  }
+];
 
-document.addEventListener('DOMContentLoaded', () => {
-  initAdminDashboard();
-});
+let appointments = [];
+let soapRecords = [];
+let sentHistory = [];
+let doctorConfig = { ...DEFAULT_DOCTOR_CONFIG };
+let activeTemplate = 'retorno';
+let activeAgendaFilter = 'all';
 
-function initAdminDashboard() {
-  loadData();
-  initTabNavigation();
-  renderAppointmentsTable(appointmentsList);
-  updateKpis();
-  initSoapCalculators();
-}
-
-function loadData() {
-  const storedAppts = localStorage.getItem('dra_ivana_appointments');
-  if (storedAppts) {
-    try {
-      appointmentsList = JSON.parse(storedAppts);
-    } catch(e) {
-      appointmentsList = [...DEFAULT_APPOINTMENTS];
-    }
+function safeToast(msg, type = 'info') {
+  if (typeof window.showToast === 'function') {
+    window.showToast(msg, type);
   } else {
-    appointmentsList = [...DEFAULT_APPOINTMENTS];
-    saveData();
-  }
-
-  const storedRecords = localStorage.getItem('dra_ivana_records');
-  if (storedRecords) {
-    try {
-      medicalRecords = JSON.parse(storedRecords);
-    } catch(e) {
-      medicalRecords = [];
-    }
+    alert(msg);
   }
 }
 
-function saveData() {
-  localStorage.setItem('dra_ivana_appointments', JSON.stringify(appointmentsList));
-  localStorage.setItem('dra_ivana_records', JSON.stringify(medicalRecords));
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function loadState() {
+  const storedAppts = localStorage.getItem('dra_ivana_appointments');
+  appointments = storedAppts ? JSON.parse(storedAppts) : [...DEFAULT_APPOINTMENTS];
+  if (!storedAppts) localStorage.setItem('dra_ivana_appointments', JSON.stringify(appointments));
+
+  const storedSoaps = localStorage.getItem('dra_ivana_soap_records');
+  soapRecords = storedSoaps ? JSON.parse(storedSoaps) : [...DEFAULT_SOAP_RECORDS];
+  if (!storedSoaps) localStorage.setItem('dra_ivana_soap_records', JSON.stringify(soapRecords));
+
+  const storedSent = localStorage.getItem('dra_ivana_sent_messages');
+  sentHistory = storedSent ? JSON.parse(storedSent) : [];
+
+  const storedCfg = localStorage.getItem('dra_ivana_doctor_config');
+  doctorConfig = storedCfg ? { ...DEFAULT_DOCTOR_CONFIG, ...JSON.parse(storedCfg) } : { ...DEFAULT_DOCTOR_CONFIG };
+}
+
+function persistAppointments() {
+  localStorage.setItem('dra_ivana_appointments', JSON.stringify(appointments));
+}
+
+function persistSentHistory() {
+  localStorage.setItem('dra_ivana_sent_messages', JSON.stringify(sentHistory));
+}
+
+function persistSoapRecords() {
+  localStorage.setItem('dra_ivana_soap_records', JSON.stringify(soapRecords));
 }
 
 /* ==========================================================================
-   NAVEGAÇÃO POR ABAS DO PAINEL
+   NAVEGAÇÃO ENTRE ABAS & MOBILE MENU
    ========================================================================== */
-function initTabNavigation() {
-  const navBtns = document.querySelectorAll('.admin-nav-item button');
-  const tabs = document.querySelectorAll('.admin-view-tab');
+function switchTab(tabId) {
+  document.querySelectorAll('.admin-nav-item').forEach((li) => li.classList.remove('active'));
+  document.querySelectorAll('.admin-view-tab').forEach((sec) => sec.classList.remove('active'));
 
-  navBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = btn.getAttribute('data-tab');
+  const btn = document.querySelector(`.admin-nav-item button[data-tab="${tabId}"]`);
+  if (btn && btn.parentElement) btn.parentElement.classList.add('active');
 
-      navBtns.forEach(b => b.parentElement.classList.remove('active'));
-      tabs.forEach(t => t.classList.remove('active'));
+  const section = document.getElementById(tabId);
+  if (section) section.classList.add('active');
 
-      btn.parentElement.classList.add('active');
-      const activeTab = document.getElementById(target);
-      if (activeTab) activeTab.classList.add('active');
-
-      if (target === 'tab-agenda') renderAppointmentsTable(appointmentsList);
-      if (target === 'tab-prontuarios') renderMedicalRecordsList();
-    });
-  });
+  const sidebar = document.getElementById('adminSidebar');
+  if (sidebar) sidebar.classList.remove('open');
 }
 
-window.switchAdminTab = function(tabId) {
-  const targetBtn = document.querySelector(`.admin-nav-item button[data-tab="${tabId}"]`);
-  if (targetBtn) targetBtn.click();
+function initNavigation() {
+  document.querySelectorAll('.admin-nav-item button').forEach((btn) => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  const mobileBtn = document.getElementById('adminMobileMenuBtn');
+  const sidebar = document.getElementById('adminSidebar');
+  if (mobileBtn && sidebar) {
+    mobileBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
+  }
+}
+
+/* ==========================================================================
+   KPIS & CONFIGURAÇÕES
+   ========================================================================== */
+function renderKPIs() {
+  const total = appointments.length;
+  const returnsCount = appointments.filter((a) => a.status === 'Retorno Marcado').length;
+  const pendingCount = appointments.filter((a) => a.status === 'Pendente').length;
+
+  const elTotal = document.getElementById('kpiTotalAppts');
+  const elRet = document.getElementById('kpiReturns');
+  const elPend = document.getElementById('kpiPending');
+  const elSent = document.getElementById('kpiSentToday');
+  const navBadge = document.getElementById('navAgendaBadge');
+
+  if (elTotal) elTotal.textContent = total;
+  if (elRet) elRet.textContent = returnsCount;
+  if (elPend) elPend.textContent = pendingCount;
+  if (elSent) elSent.textContent = sentHistory.length;
+  if (navBadge) navBadge.textContent = total;
+}
+
+function hydrateConfigUI() {
+  const sidebarPhone = document.getElementById('sidebarDoctorPhone');
+  if (sidebarPhone) sidebarPhone.textContent = doctorConfig.phone;
+
+  const cfgPhone = document.getElementById('cfgDoctorPhone');
+  const cfgSig = document.getElementById('cfgDoctorSignature');
+  const cfgMorn = document.getElementById('cfgHoursMorning');
+  const cfgAft = document.getElementById('cfgHoursAfternoon');
+
+  if (cfgPhone) cfgPhone.value = doctorConfig.phone;
+  if (cfgSig) cfgSig.value = doctorConfig.signature;
+  if (cfgMorn) cfgMorn.value = doctorConfig.hoursMorning;
+  if (cfgAft) cfgAft.value = doctorConfig.hoursAfternoon;
+}
+
+window.saveDoctorConfig = function() {
+  doctorConfig = {
+    phone: document.getElementById('cfgDoctorPhone').value.trim() || DEFAULT_DOCTOR_CONFIG.phone,
+    signature: document.getElementById('cfgDoctorSignature').value.trim() || DEFAULT_DOCTOR_CONFIG.signature,
+    hoursMorning: document.getElementById('cfgHoursMorning').value.trim(),
+    hoursAfternoon: document.getElementById('cfgHoursAfternoon').value.trim()
+  };
+  localStorage.setItem('dra_ivana_doctor_config', JSON.stringify(doctorConfig));
+  hydrateConfigUI();
+  updateQuickMessagePreview();
+  safeToast('Configurações de contato e assinatura salvas!', 'success');
 };
 
 /* ==========================================================================
-   MÉTRICAS / KPIS
+   CENTRAL DE MENSAGEM RÁPIDA (RETORNO / DIA MARCADO / MENSAGEM / EXAMES)
    ========================================================================== */
-function updateKpis() {
-  const total = appointmentsList.length;
-  const confirmed = appointmentsList.filter(a => a.status === 'Confirmada').length;
-  const pending = appointmentsList.filter(a => a.status === 'Pendente').length;
-  const usfCount = appointmentsList.filter(a => a.modality.includes('USF')).length;
+function renderQuickPatientChips() {
+  const container = document.getElementById('quickPatientChips');
+  if (!container) return;
 
-  const elTotal = document.getElementById('kpiTotalAppts');
-  const elConfirmed = document.getElementById('kpiConfirmedAppts');
-  const elPending = document.getElementById('kpiPendingAppts');
-  const elUsf = document.getElementById('kpiUsfAppts');
+  const chips = appointments.slice(0, 8).map((item) => `
+    <button type="button" class="quick-chip" onclick="selectQuickPatient('${item.id}')">
+      👤 ${escapeHtml(item.patientName.split(' ').slice(0, 2).join(' '))}
+    </button>
+  `).join('');
 
-  if (elTotal) elTotal.textContent = total;
-  if (elConfirmed) elConfirmed.textContent = confirmed;
-  if (elPending) elPending.textContent = pending;
-  if (elUsf) elUsf.textContent = usfCount;
+  container.innerHTML = chips + `
+    <button type="button" class="quick-chip" onclick="clearQuickPatient()">
+      ✨ Novo Paciente
+    </button>
+  `;
+}
 
-  // Atualiza badge de pendentes na sidebar
-  const badge = document.getElementById('navPendingBadge');
-  if (badge) {
-    badge.textContent = pending;
-    badge.style.display = pending > 0 ? 'inline-block' : 'none';
+window.selectQuickPatient = function(id) {
+  const item = appointments.find((a) => a.id === id);
+  if (!item) return;
+
+  document.getElementById('qmPatientName').value = item.patientName;
+  document.getElementById('qmPatientPhone').value = item.patientPhone;
+  document.getElementById('qmDate').value = brToISODate(item.date);
+  document.getElementById('qmTime').value = item.time || '09:00';
+  const loc = document.getElementById('qmLocation');
+  if (loc && Array.from(loc.options).some((o) => o.value === item.modality)) {
+    loc.value = item.modality;
+  }
+  document.getElementById('qmExtraNote').value = item.notes || item.reason || '';
+  highlightActiveTimeChip(item.time || '09:00');
+  updateQuickMessagePreview();
+};
+
+window.clearQuickPatient = function() {
+  document.getElementById('qmPatientName').value = '';
+  document.getElementById('qmPatientPhone').value = '';
+  document.getElementById('qmExtraNote').value = '';
+  document.getElementById('qmPatientName').focus();
+  updateQuickMessagePreview();
+};
+
+window.setQuickDateOffset = function(days) {
+  const dateInput = document.getElementById('qmDate');
+  if (dateInput) {
+    dateInput.value = getFutureISODate(days);
+    updateQuickMessagePreview();
+  }
+};
+
+function highlightActiveTimeChip(timeVal) {
+  document.querySelectorAll('#quickTimeChips .quick-chip').forEach((chip) => {
+    chip.classList.toggle('active', chip.dataset.time === timeVal);
+  });
+}
+
+function buildQuickMessageText() {
+  const name = (document.getElementById('qmPatientName')?.value || '').trim() || 'Paciente';
+  const firstName = name.split(' ')[0];
+  const dateBR = isoToBRDate(document.getElementById('qmDate')?.value || getFutureISODate(1));
+  const time = document.getElementById('qmTime')?.value || '09:00';
+  const loc = document.getElementById('qmLocation')?.value || 'USF Luana Freitas (ESF II)';
+  const note = (document.getElementById('qmExtraNote')?.value || '').trim();
+  const sig = doctorConfig.signature || DEFAULT_DOCTOR_CONFIG.signature;
+
+  const extraBlock = note ? `\n\n📝 *Orientações:* ${note}` : '';
+
+  switch (activeTemplate) {
+    case 'retorno':
+      return `Olá, *${firstName}*! Tudo bem? 😊\n\nPassando para confirmar o seu *retorno médico*:\n📅 *Data:* ${dateBR}\n⏰ *Horário:* ${time}\n🏥 *Local:* ${loc}${extraBlock}\n\nPor favor, responda com *"OK"* para confirmar sua presença.\n\nAtenciosamente,\n*${sig}*`;
+
+    case 'dia_marcado':
+      return `Olá, *${firstName}*! Tudo bem? 🩺\n\nLembrando que a sua *consulta está marcada*:\n📅 *Dia:* ${dateBR}\n⏰ *Horário:* ${time}\n📍 *Local:* ${loc}${extraBlock}\n\nVocê confirma a sua presença nesse horário?\n\nUm abraço,\n*${sig}*`;
+
+    case 'exames':
+      return `Olá, *${firstName}*! 🔬\n\nLembrete importante para a nossa consulta no dia *${dateBR}* às *${time}* (${loc}):\nPor favor, lembre-se de levar os *resultados dos seus exames laboratoriais* e a receita/lista das medicações que você está utilizando.${extraBlock}\n\nQualquer dúvida, estou à disposição.\n*${sig}*`;
+
+    case 'remarcar':
+      return `Olá, *${firstName}*! Tudo bem?\n\nPrecisamos ajustar o horário do seu atendimento. Conseguimos reservar uma nova opção para você:\n📅 *Nova Data:* ${dateBR}\n⏰ *Novo Horário:* ${time}\n📍 *Local:* ${loc}${extraBlock}\n\nEsse novo dia fica bom para você? Se preferir outro horário, pode me avisar por aqui.\n\n*${sig}*`;
+
+    case 'mensagem':
+    default:
+      return `Olá, *${firstName}*! Tudo bem? 😊\n\n${note || 'Passando para saber como você está se sentindo após o nosso atendimento e se ficou alguma dúvida sobre as orientações.'}\n\nQualquer necessidade, pode me chamar por aqui.\n*${sig}*`;
   }
 }
 
-/* ==========================================================================
-   RENDERIZAÇÃO DA TABELA DE CONSULTAS
-   ========================================================================== */
-function renderAppointmentsTable(list) {
-  const tbody = document.getElementById('appointmentsTableBody');
-  if (!tbody) return;
+function formatWhatsAppPreviewHtml(text) {
+  const safe = escapeHtml(text);
+  return safe.replace(/\*([^*]+)\*/g, '<strong>$1</strong>');
+}
 
-  if (list.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--admin-text-muted);">
-          Nenhuma consulta encontrada com os filtros selecionados.
-        </td>
-      </tr>
-    `;
+function updateQuickMessagePreview() {
+  const msg = buildQuickMessageText();
+  const name = (document.getElementById('qmPatientName')?.value || '').trim() || 'Paciente';
+  const phone = (document.getElementById('qmPatientPhone')?.value || '').trim() || 'Digite o WhatsApp';
+
+  const initials = name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('') || 'PA';
+  const now = new Date();
+  const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+  document.getElementById('waPreviewInitials').textContent = initials;
+  document.getElementById('waPreviewName').textContent = name;
+  document.getElementById('waPreviewPhone').textContent = phone;
+  document.getElementById('waPreviewCharCount').textContent = `${msg.length} caracteres`;
+  document.getElementById('waPreviewBubble').innerHTML = `${formatWhatsAppPreviewHtml(msg)}<div class="wa-bubble-meta"><span>${timeStr}</span><span class="wa-checks">✓✓</span></div>`;
+
+  // Ajusta label de observação no modo Mensagem Livre
+  const noteLabel = document.getElementById('qmExtraNoteLabel');
+  const scheduleBox = document.getElementById('qmScheduleFields');
+  if (noteLabel && scheduleBox) {
+    if (activeTemplate === 'mensagem') {
+      noteLabel.textContent = 'Escreva sua mensagem personalizada para o paciente';
+      scheduleBox.style.opacity = '0.55';
+    } else {
+      noteLabel.textContent = 'Orientações adicionais (ex: exames, jejum, receita)';
+      scheduleBox.style.opacity = '1';
+    }
+  }
+}
+
+function getTemplateLabel(key) {
+  const map = {
+    retorno: '🔄 Retorno',
+    dia_marcado: '📅 Dia Marcado',
+    mensagem: '💬 Mensagem',
+    exames: '🧪 Exames',
+    remarcar: '⏰ Remarcar'
+  };
+  return map[key] || '💬 Mensagem';
+}
+
+window.dispatchQuickWhatsApp = function(saveToAgenda) {
+  const name = (document.getElementById('qmPatientName').value || '').trim();
+  const rawPhone = (document.getElementById('qmPatientPhone').value || '').trim();
+  const dateBR = isoToBRDate(document.getElementById('qmDate').value || getFutureISODate(1));
+  const time = document.getElementById('qmTime').value || '09:00';
+  const loc = document.getElementById('qmLocation').value;
+  const note = (document.getElementById('qmExtraNote').value || '').trim();
+
+  if (!name) {
+    safeToast('Informe o nome do paciente antes de enviar.', 'warning');
+    document.getElementById('qmPatientName').focus();
     return;
   }
 
-  tbody.innerHTML = list.map(item => `
-    <tr>
-      <td><strong>${item.id}</strong></td>
-      <td>
-        <div style="font-weight: 800; color: var(--admin-text-main);">${item.patientName}</div>
-        <div style="font-size: 0.8rem; color: var(--admin-text-muted);">CPF: ${item.patientCpf || 'Não informado'}</div>
-      </td>
-      <td>
-        <div><strong>${item.date}</strong> às <strong>${item.time}</strong></div>
-        <div style="font-size: 0.8rem; color: var(--admin-text-muted);">${item.modality}</div>
-      </td>
-      <td>
-        <span style="font-size: 0.85rem; font-weight: 600;">${item.reason}</span>
-      </td>
-      <td>
-        <span class="badge-status status-${item.status.toLowerCase()}">
-          ${item.status}
-        </span>
-      </td>
-      <td>
-        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-          <button class="btn btn-sm btn-primary" onclick="openSoapModal('${item.id}')" title="Abrir Prontuário Eletrônico">
-            🩺 Atender (SOAP)
-          </button>
-          <button class="btn btn-sm btn-whatsapp" onclick="sendWhatsAppConfirmation('${item.id}')" title="Confirmar via WhatsApp">
-            📱 WhatsApp
-          </button>
-          <button class="btn btn-sm btn-outline" onclick="toggleAppointmentStatus('${item.id}')" title="Alternar Status">
-            ✓ Status
-          </button>
-        </div>
-      </td>
-    </tr>
+  const phoneDigits = normalizeWhatsAppDigits(rawPhone || doctorConfig.phone);
+  const text = buildQuickMessageText();
+
+  if (saveToAgenda) {
+    const newStatus = activeTemplate === 'retorno' ? 'Retorno Marcado' : 'Confirmada';
+    const existing = appointments.find((a) => a.patientName.toLowerCase() === name.toLowerCase() && a.date === dateBR);
+    if (existing) {
+      existing.time = time;
+      existing.modality = loc;
+      existing.status = newStatus;
+      if (note) existing.notes = note;
+    } else {
+      appointments.unshift({
+        id: 'MED-' + Math.floor(100000 + Math.random() * 900000),
+        patientName: name,
+        patientPhone: rawPhone || doctorConfig.phone,
+        date: dateBR,
+        time: time,
+        modality: loc,
+        reason: activeTemplate === 'retorno' ? 'Retorno médico agendado via WhatsApp' : 'Consulta marcada pelo painel',
+        status: newStatus,
+        notes: note
+      });
+    }
+    persistAppointments();
+    renderAgendaCards();
+    renderQuickPatientChips();
+    safeToast(`Salvo na agenda (${dateBR} às ${time}) e abrindo WhatsApp!`, 'success');
+  } else {
+    safeToast(`Abrindo WhatsApp para ${name}...`, 'success');
+  }
+
+  // Salva no histórico de envios
+  sentHistory.unshift({
+    id: 'MSG-' + Date.now(),
+    patientName: name,
+    patientPhone: rawPhone || doctorConfig.phone,
+    type: getTemplateLabel(activeTemplate),
+    dateBR,
+    time,
+    text,
+    sentAt: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  });
+  if (sentHistory.length > 20) sentHistory.pop();
+  persistSentHistory();
+  renderSentHistory();
+  renderKPIs();
+
+  window.open(`https://api.whatsapp.com/send?phone=${phoneDigits}&text=${encodeURIComponent(text)}`, '_blank');
+};
+
+window.sendTestToDoctorPhone = function() {
+  const digits = normalizeWhatsAppDigits(doctorConfig.phone);
+  const text = buildQuickMessageText();
+  window.open(`https://api.whatsapp.com/send?phone=${digits}&text=${encodeURIComponent(text)}`, '_blank');
+  safeToast(`Enviando prévia para o WhatsApp oficial (${doctorConfig.phone})!`, 'info');
+};
+
+window.copyQuickMessage = function() {
+  const text = buildQuickMessageText();
+  navigator.clipboard.writeText(text).then(() => {
+    safeToast('Mensagem copiada! Só colar no WhatsApp.', 'success');
+  }).catch(() => {
+    safeToast('Não foi possível copiar automaticamente.', 'warning');
+  });
+};
+
+function renderSentHistory() {
+  const container = document.getElementById('sentHistoryList');
+  if (!container) return;
+
+  if (!sentHistory.length) {
+    container.innerHTML = `<p style="font-size: 0.78rem; color: var(--admin-text-muted); text-align: center; margin: 0.75rem 0;">Nenhuma mensagem enviada ainda hoje.</p>`;
+    return;
+  }
+
+  container.innerHTML = sentHistory.slice(0, 6).map((h) => `
+    <div class="sent-history-item">
+      <div>
+        <div class="sent-history-name">${escapeHtml(h.patientName)}</div>
+        <div class="sent-history-meta">${escapeHtml(h.type)} • ${h.dateBR} ${h.time} • Enviado às ${h.sentAt}</div>
+      </div>
+      <button type="button" class="btn-mini btn-mini-wa" onclick="resendHistoryMsg('${h.id}')">Reenviar</button>
+    </div>
   `).join('');
 }
 
-/* ==========================================================================
-   FILTROS DA AGENDA
-   ========================================================================== */
-window.filterAppointments = function() {
-  const query = document.getElementById('searchPatientInput')?.value.toLowerCase().trim() || '';
-  const status = document.getElementById('filterStatusSelect')?.value || 'todos';
+window.resendHistoryMsg = function(id) {
+  const item = sentHistory.find((h) => h.id === id);
+  if (!item) return;
+  const digits = normalizeWhatsAppDigits(item.patientPhone);
+  window.open(`https://api.whatsapp.com/send?phone=${digits}&text=${encodeURIComponent(item.text)}`, '_blank');
+};
 
-  const filtered = appointmentsList.filter(item => {
-    const matchesQuery = item.patientName.toLowerCase().includes(query) ||
-                         item.patientCpf.includes(query) ||
-                         item.id.toLowerCase().includes(query);
-    const matchesStatus = (status === 'todos') || (item.status === status);
-    return matchesQuery && matchesStatus;
+window.clearSentHistory = function() {
+  sentHistory = [];
+  persistSentHistory();
+  renderSentHistory();
+  renderKPIs();
+};
+
+function initQuickMessageComposer() {
+  // Data padrão: amanhã
+  const dateInput = document.getElementById('qmDate');
+  if (dateInput && !dateInput.value) dateInput.value = getFutureISODate(1);
+
+  // Template picker
+  document.querySelectorAll('#templatePicker .template-card-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#templatePicker .template-card-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeTemplate = btn.dataset.template;
+      updateQuickMessagePreview();
+    });
   });
 
-  renderAppointmentsTable(filtered);
-};
+  // Time chips
+  document.querySelectorAll('#quickTimeChips .quick-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      document.getElementById('qmTime').value = chip.dataset.time;
+      highlightActiveTimeChip(chip.dataset.time);
+      updateQuickMessagePreview();
+    });
+  });
 
-window.toggleAppointmentStatus = function(id) {
-  const appt = appointmentsList.find(a => a.id === id);
-  if (!appt) return;
+  // Live listeners
+  ['qmPatientName', 'qmPatientPhone', 'qmDate', 'qmTime', 'qmLocation', 'qmExtraNote'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateQuickMessagePreview);
+    if (el) el.addEventListener('change', updateQuickMessagePreview);
+  });
 
-  const cycle = {
-    'Pendente': 'Confirmada',
-    'Confirmada': 'Concluída',
-    'Concluída': 'Pendente'
-  };
-
-  appt.status = cycle[appt.status] || 'Confirmada';
-  saveData();
-  updateKpis();
-  filterAppointments();
-  showToast(`Status da consulta ${id} atualizado para ${appt.status}!`, 'info');
-};
-
-window.sendWhatsAppConfirmation = function(id) {
-  const appt = appointmentsList.find(a => a.id === id);
-  if (!appt) return;
-
-  const phoneClean = appt.patientPhone.replace(/\D/g, '');
-  const msg = encodeURIComponent(
-    `Olá ${appt.patientName}! Aqui é do consultório da Dra. Ivana Caroline Silva Bergamin (CRM/AC 3484).\n` +
-    `Confirmamos sua consulta agendada para ${appt.date} às ${appt.time} (${appt.modality}).\n` +
-    `Por favor, traga seus exames recentes e documento oficial com foto. Qualquer dúvida estamos à disposição!`
-  );
-
-  window.open(`https://api.whatsapp.com/send?phone=55${phoneClean}&text=${msg}`, '_blank');
-};
+  // Pré-seleciona o primeiro paciente para já mostrar uma prévia linda
+  if (appointments.length > 0) {
+    selectQuickPatient(appointments[0].id);
+  } else {
+    updateQuickMessagePreview();
+  }
+}
 
 /* ==========================================================================
-   PRONTUÁRIO CLÍNICO ELETRÔNICO (MÉTODO SOAP)
+   AGENDA & RETORNOS (CARDS INTERATIVOS)
    ========================================================================== */
-let activeConsultationAppt = null;
+function statusBadgeClass(status) {
+  if (status === 'Confirmada') return 'status-confirmada';
+  if (status === 'Retorno Marcado') return 'status-retorno';
+  if (status === 'Pendente') return 'status-pendente';
+  if (status === 'Concluída') return 'status-concluida';
+  return 'status-cancelada';
+}
 
-window.openSoapModal = function(id) {
-  const appt = appointmentsList.find(a => a.id === id);
-  if (!appt) return;
+function renderAgendaCards() {
+  const container = document.getElementById('agendaCardsList');
+  if (!container) return;
 
-  activeConsultationAppt = appt;
-  document.getElementById('soapPatientName').textContent = appt.patientName;
-  document.getElementById('soapPatientMeta').textContent = `CPF: ${appt.patientCpf} • Consulta: ${appt.date} às ${appt.time} • Modalidade: ${appt.modality}`;
-  
-  // Limpa campos
-  document.getElementById('soapSubjetivo').value = `Paciente refere queixa de ${appt.reason}. Relata evolução de...`;
-  document.getElementById('soapPa').value = "120/80";
-  document.getElementById('soapFc').value = "74";
-  document.getElementById('soapGlicose').value = "92";
-  document.getElementById('soapPeso').value = "70";
-  document.getElementById('soapAltura').value = "165";
-  document.getElementById('soapImc').textContent = "25.7 kg/m²";
-  document.getElementById('soapAvaliacao').value = "K86 - Hipertensão Arterial Sistêmica não complicada / Check-up de rotina (CIAP-2)";
-  document.getElementById('soapPlano').value = 
-    "1. Manter medicação habitual.\n" +
-    "2. Solicitação de exames laboratoriais complementares: Hemograma Completo, Glicemia de Jejum, Creatinina sérica, EAS.\n" +
-    "3. Orientações higienodietéticas e estímulo à prática de atividade física regular.\n" +
-    "4. Retorno em 90 dias com os resultados dos exames.";
+  const query = (document.getElementById('agendaSearchInput')?.value || '').trim().toLowerCase();
+  const filtered = appointments.filter((a) => {
+    const matchesStatus = activeAgendaFilter === 'all' || a.status === activeAgendaFilter;
+    const matchesSearch = !query ||
+      a.patientName.toLowerCase().includes(query) ||
+      (a.reason || '').toLowerCase().includes(query) ||
+      (a.modality || '').toLowerCase().includes(query);
+    return matchesStatus && matchesSearch;
+  });
 
-  const modal = document.getElementById('soapModal');
-  if (modal) modal.classList.add('open');
+  if (!filtered.length) {
+    container.innerHTML = `<div class="panel-card" style="grid-column: 1 / -1; text-align: center; color: var(--admin-text-muted);">Nenhum agendamento encontrado com esse filtro.</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map((item) => `
+    <div class="agenda-card">
+      <div class="agenda-card-top">
+        <span class="agenda-time-pill">📅 ${escapeHtml(item.date)} • ⏰ ${escapeHtml(item.time)}</span>
+        <span class="status-badge ${statusBadgeClass(item.status)}">${escapeHtml(item.status)}</span>
+      </div>
+      <div>
+        <h4 class="agenda-patient-name">${escapeHtml(item.patientName)}</h4>
+        <div class="agenda-patient-meta">📱 ${escapeHtml(item.patientPhone)} • 🏥 ${escapeHtml(item.modality)}</div>
+      </div>
+      <div class="agenda-reason-box">
+        <strong>Motivo:</strong> ${escapeHtml(item.reason || 'Consulta de rotina')}
+        ${item.notes ? `<br><strong>Obs:</strong> ${escapeHtml(item.notes)}` : ''}
+      </div>
+      <div class="agenda-card-actions">
+        <button type="button" class="btn-mini btn-mini-wa" onclick="jumpToQuickMessage('${item.id}', 'dia_marcado')">💬 Mensagem</button>
+        <button type="button" class="btn-mini btn-mini-return" onclick="jumpToQuickMessage('${item.id}', 'retorno')">🔄 Retorno</button>
+        ${item.status !== 'Confirmada' ? `<button type="button" class="btn-mini" onclick="updateApptStatus('${item.id}', 'Confirmada')">✓ Confirmar</button>` : ''}
+        <button type="button" class="btn-mini" onclick="openSoapModal('${item.id}')">🩺 SOAP</button>
+        <button type="button" class="btn-mini" style="color: var(--admin-danger); margin-left: auto;" onclick="deleteAppointment('${item.id}')" title="Remover">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.jumpToQuickMessage = function(id, templateKey) {
+  activeTemplate = templateKey;
+  document.querySelectorAll('#templatePicker .template-card-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.template === templateKey);
+  });
+  selectQuickPatient(id);
+  if (templateKey === 'retorno') {
+    setQuickDateOffset(15);
+  }
+  switchTab('tab-quickmsg');
+  safeToast(templateKey === 'retorno' ? 'Modo Retorno (+15 dias) carregado!' : 'Mensagem de Dia Marcado pronta para enviar!', 'info');
+};
+
+window.updateApptStatus = function(id, status) {
+  const item = appointments.find((a) => a.id === id);
+  if (!item) return;
+  item.status = status;
+  persistAppointments();
+  renderAgendaCards();
+  renderKPIs();
+  safeToast(`Status de ${item.patientName} atualizado para ${status}.`, 'success');
+};
+
+window.deleteAppointment = function(id) {
+  appointments = appointments.filter((a) => a.id !== id);
+  persistAppointments();
+  renderAgendaCards();
+  renderQuickPatientChips();
+  renderKPIs();
+  safeToast('Agendamento removido da agenda.', 'info');
+};
+
+window.openNewAppointmentModal = function() {
+  document.getElementById('naDate').value = getFutureISODate(1);
+  document.getElementById('newApptModal').classList.add('open');
+};
+
+window.closeNewAppointmentModal = function() {
+  document.getElementById('newApptModal').classList.remove('open');
+};
+
+function initAgendaEvents() {
+  document.querySelectorAll('#agendaFilterPills .quick-chip').forEach((pill) => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('#agendaFilterPills .quick-chip').forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeAgendaFilter = pill.dataset.filter;
+      renderAgendaCards();
+    });
+  });
+
+  const searchInput = document.getElementById('agendaSearchInput');
+  if (searchInput) searchInput.addEventListener('input', renderAgendaCards);
+
+  const form = document.getElementById('newApptForm');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newAppt = {
+        id: 'MED-' + Math.floor(100000 + Math.random() * 900000),
+        patientName: document.getElementById('naName').value.trim(),
+        patientPhone: document.getElementById('naPhone').value.trim(),
+        date: isoToBRDate(document.getElementById('naDate').value),
+        time: document.getElementById('naTime').value,
+        modality: document.getElementById('naModality').value,
+        reason: document.getElementById('naReason').value.trim() || 'Consulta agendada',
+        status: document.getElementById('naType').value,
+        notes: ''
+      };
+      appointments.unshift(newAppt);
+      persistAppointments();
+      renderAgendaCards();
+      renderQuickPatientChips();
+      renderKPIs();
+      form.reset();
+      closeNewAppointmentModal();
+      safeToast(`Horário salvo para ${newAppt.patientName} em ${newAppt.date} às ${newAppt.time}!`, 'success');
+    });
+  }
+}
+
+/* ==========================================================================
+   PRONTUÁRIO SOAP & RECEITUÁRIO TIMBRADO
+   ========================================================================== */
+function renderSoapHistory() {
+  const container = document.getElementById('soapHistoryContainer');
+  if (!container) return;
+
+  if (!soapRecords.length) {
+    container.innerHTML = `<p style="color: var(--admin-text-muted); text-align: center;">Nenhuma evolução clínica registrada ainda.</p>`;
+    return;
+  }
+
+  container.innerHTML = soapRecords.map((rec) => `
+    <div class="agenda-card">
+      <div class="agenda-card-top">
+        <strong>🩺 ${escapeHtml(rec.patientName)}</strong>
+        <span class="agenda-time-pill">${escapeHtml(rec.date)}</span>
+      </div>
+      <div class="agenda-reason-box">
+        <div><strong>S:</strong> ${escapeHtml(rec.s)}</div>
+        <div><strong>O:</strong> ${escapeHtml(rec.o)}</div>
+        <div><strong>A:</strong> ${escapeHtml(rec.a)}</div>
+        <div><strong>P:</strong> ${escapeHtml(rec.p)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.openSoapModal = function(apptId) {
+  const item = appointments.find((a) => a.id === apptId);
+  document.getElementById('soapApptId').value = apptId || '';
+  const manualGroup = document.getElementById('soapManualNameGroup');
+
+  if (item) {
+    manualGroup.style.display = 'none';
+    document.getElementById('soapPatientSubtitle').textContent = `${item.patientName} • ${item.date} às ${item.time}`;
+    document.getElementById('soapSubjetivo').value = item.reason || '';
+    document.getElementById('soapObjetivo').value = 'PA: 120/80 mmHg | FC: 72 bpm | SatO2: 99% | BEG, LOTE.';
+    document.getElementById('soapAvaliacao').value = '';
+    document.getElementById('soapPlano').value = '';
+  } else {
+    manualGroup.style.display = 'block';
+    document.getElementById('soapManualPatientName').value = '';
+    document.getElementById('soapPatientSubtitle').textContent = 'Nova Evolução Avulsa / Receituário';
+    document.getElementById('soapSubjetivo').value = '';
+    document.getElementById('soapObjetivo').value = '';
+    document.getElementById('soapAvaliacao').value = '';
+    document.getElementById('soapPlano').value = '';
+  }
+
+  document.getElementById('soapModal').classList.add('open');
 };
 
 window.closeSoapModal = function() {
-  const modal = document.getElementById('soapModal');
-  if (modal) modal.classList.remove('open');
+  document.getElementById('soapModal').classList.remove('open');
 };
 
-function initSoapCalculators() {
-  const pesoInput = document.getElementById('soapPeso');
-  const alturaInput = document.getElementById('soapAltura');
-  const imcDisplay = document.getElementById('soapImc');
+window.saveSoapRecord = function() {
+  const apptId = document.getElementById('soapApptId').value;
+  const item = appointments.find((a) => a.id === apptId);
+  const patientName = item ? item.patientName : (document.getElementById('soapManualPatientName').value.trim() || 'Paciente');
 
-  function updateImc() {
-    const p = parseFloat(pesoInput?.value);
-    const a = parseFloat(alturaInput?.value) / 100;
-    if (p > 0 && a > 0 && imcDisplay) {
-      const imc = (p / (a * a)).toFixed(1);
-      imcDisplay.textContent = `${imc} kg/m²`;
-    }
+  soapRecords.unshift({
+    id: 'SOAP-' + Date.now(),
+    patientName,
+    date: new Date().toLocaleDateString('pt-BR'),
+    s: document.getElementById('soapSubjetivo').value.trim() || '—',
+    o: document.getElementById('soapObjetivo').value.trim() || '—',
+    a: document.getElementById('soapAvaliacao').value.trim() || '—',
+    p: document.getElementById('soapPlano').value.trim() || '—'
+  });
+  persistSoapRecords();
+
+  if (item) {
+    item.status = 'Concluída';
+    persistAppointments();
+    renderAgendaCards();
   }
 
-  pesoInput?.addEventListener('input', updateImc);
-  alturaInput?.addEventListener('input', updateImc);
-}
-
-window.saveSoapRecord = function() {
-  if (!activeConsultationAppt) return;
-
-  const record = {
-    id: "REC-" + Date.now(),
-    apptId: activeConsultationAppt.id,
-    patientName: activeConsultationAppt.patientName,
-    date: new Date().toLocaleDateString('pt-BR'),
-    subjetivo: document.getElementById('soapSubjetivo').value,
-    pa: document.getElementById('soapPa').value,
-    fc: document.getElementById('soapFc').value,
-    glicose: document.getElementById('soapGlicose').value,
-    peso: document.getElementById('soapPeso').value,
-    altura: document.getElementById('soapAltura').value,
-    avaliacao: document.getElementById('soapAvaliacao').value,
-    plano: document.getElementById('soapPlano').value
-  };
-
-  medicalRecords.unshift(record);
-  activeConsultationAppt.status = 'Concluída';
-  saveData();
-  updateKpis();
-  filterAppointments();
+  renderSoapHistory();
+  renderKPIs();
   closeSoapModal();
-  showToast('Prontuário SOAP salvo com sucesso no histórico da paciente!', 'success');
+  safeToast(`Prontuário SOAP salvo para ${patientName}!`, 'success');
+};
+
+window.printPrescription = function() {
+  const apptId = document.getElementById('soapApptId').value;
+  const item = appointments.find((a) => a.id === apptId);
+  const patientName = item ? item.patientName : (document.getElementById('soapManualPatientName').value.trim() || 'Paciente');
+  const plano = document.getElementById('soapPlano').value.trim() || 'Orientações clínicas conforme consulta médica.';
+  const today = new Date().toLocaleDateString('pt-BR');
+
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = `
+    <div style="font-family: 'Plus Jakarta Sans', Arial, sans-serif; color: #0f172a; max-width: 720px; margin: 0 auto; border: 2px solid #0284c7; padding: 36px; border-radius: 12px;">
+      <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 24px;">
+        <div>
+          <h1 style="margin: 0; font-size: 20px; color: #0369a1;">Dra. Ivana Caroline Silva Bergamin</h1>
+          <p style="margin: 4px 0 0; font-size: 13px; color: #475569;">Médica • Medicina de Família e Comunidade (COREME/FUNDHACRE)</p>
+          <p style="margin: 2px 0 0; font-size: 12px; color: #64748b;">WhatsApp: ${escapeHtml(doctorConfig.phone)}</p>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-weight: 800; font-size: 14px; color: #0284c7;">CRM/AC 3484</div>
+          <div style="font-size: 12px; color: #64748b;">Rio Branco – AC • ${today}</div>
+        </div>
+      </div>
+      <div style="margin-bottom: 22px; font-size: 14px;">
+        <strong>Paciente:</strong> ${escapeHtml(patientName)}
+      </div>
+      <div style="min-height: 280px; font-size: 15px; line-height: 1.75; white-space: pre-wrap; margin-bottom: 40px;">
+        <h3 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: #0369a1; margin-bottom: 12px;">Receituário & Plano Terapêutico</h3>
+        ${escapeHtml(plano)}
+      </div>
+      <div style="text-align: center; border-top: 1px solid #cbd5e1; padding-top: 14px; width: 320px; margin: 0 auto;">
+        <strong style="font-size: 13px;">Dra. Ivana Caroline Silva Bergamin</strong><br>
+        <span style="font-size: 12px; color: #64748b;">CRM/AC 3484 • Assinatura Médica</span>
+      </div>
+    </div>
+  `;
+  window.print();
 };
 
 /* ==========================================================================
-   HISTÓRICO DE PRONTUÁRIOS
+   TRIAGENS RECEBIDAS DO PORTAL PÚBLICO
    ========================================================================== */
-function renderMedicalRecordsList() {
-  const container = document.getElementById('recordsListContainer');
+function renderTriageInbox() {
+  const container = document.getElementById('triageInboxContainer');
+  const badge = document.getElementById('navTriageBadge');
   if (!container) return;
 
-  if (medicalRecords.length === 0) {
-    container.innerHTML = `
-      <div style="text-align: center; padding: 3rem; color: var(--admin-text-muted);">
-        <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">Nenhum prontuário registrado ainda.</p>
-        <p style="font-size: 0.9rem;">Ao atender uma consulta na Agenda através do botão <strong>"Atender (SOAP)"</strong>, o registro clínico será arquivado aqui com segurança.</p>
-      </div>
-    `;
+  const stored = localStorage.getItem('dra_ivana_triages');
+  const triages = stored ? JSON.parse(stored) : [];
+
+  if (badge) {
+    badge.textContent = triages.length;
+    badge.style.display = triages.length > 0 ? 'inline-block' : 'none';
+  }
+
+  if (!triages.length) {
+    container.innerHTML = `<p style="color: var(--admin-text-muted); text-align: center;">Nenhuma pré-triagem enviada pelo site público até o momento.</p>`;
     return;
   }
 
-  container.innerHTML = medicalRecords.map(rec => `
-    <div class="card" style="margin-bottom: 1.5rem; padding: 1.75rem; border-left: 4px solid var(--admin-accent);">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-        <div>
-          <h4 style="font-size: 1.25rem; font-weight: 800; color: var(--admin-text-main); margin: 0;">${rec.patientName}</h4>
-          <span style="font-size: 0.8rem; color: var(--admin-text-muted);">Atendimento em ${rec.date} • ID: ${rec.id}</span>
-        </div>
-        <button class="btn btn-sm btn-outline" onclick="printPrescription('${rec.id}')">
-          🖨️ Emitir Receituário Timbrado
-        </button>
+  container.innerHTML = triages.map((t) => `
+    <div class="agenda-card">
+      <div class="agenda-card-top">
+        <strong>🚨 ${escapeHtml(t.name || 'Paciente')}</strong>
+        <span class="agenda-time-pill">${escapeHtml(t.date || '')}</span>
       </div>
-
-      <div class="soap-container">
-        <div class="soap-box">
-          <div class="soap-title soap-s"><span>S</span> Subjetivo (História & Sintomas)</div>
-          <p style="font-size: 0.885rem; color: var(--admin-text-main); margin: 0; line-height: 1.5;">${rec.subjetivo}</p>
-        </div>
-
-        <div class="soap-box">
-          <div class="soap-title soap-o"><span>O</span> Objetivo (Dados Vitais & Exame Físico)</div>
-          <p style="font-size: 0.885rem; color: var(--admin-text-main); margin: 0; line-height: 1.5;">
-            PA: <strong>${rec.pa} mmHg</strong> • FC: <strong>${rec.fc} bpm</strong> • Glicemia: <strong>${rec.glicose} mg/dL</strong> • Peso: <strong>${rec.peso} kg</strong> • Altura: <strong>${rec.altura} cm</strong>
-          </p>
-        </div>
-
-        <div class="soap-box">
-          <div class="soap-title soap-a"><span>A</span> Avaliação / Diagnóstico (CIAP-2 / CID-10)</div>
-          <p style="font-size: 0.885rem; color: var(--admin-text-main); margin: 0; line-height: 1.5;">${rec.avaliacao}</p>
-        </div>
-
-        <div class="soap-box">
-          <div class="soap-title soap-p"><span>P</span> Plano Terapêutico & Prescrição</div>
-          <p style="font-size: 0.885rem; color: var(--admin-text-main); margin: 0; white-space: pre-line; line-height: 1.5;">${rec.plano}</p>
-        </div>
+      <div class="agenda-reason-box">
+        <strong>Queixa:</strong> ${escapeHtml(t.symptoms || t.complaint || 'Pré-consulta enviada')}
+      </div>
+      <div class="agenda-card-actions">
+        <button type="button" class="btn-mini btn-mini-wa" onclick="replyTriageWhatsApp('${escapeHtml(t.name || '')}', '${escapeHtml(t.phone || '')}')">
+          💬 Responder no WhatsApp
+        </button>
       </div>
     </div>
   `).join('');
 }
 
-/* ==========================================================================
-   EMISSÃO DE RECEITUÁRIO MÉDICO TIMBRADO OFICIAL
-   ========================================================================== */
-window.printPrescription = function(recordId) {
-  const rec = medicalRecords.find(r => r.id === recordId);
-  const patient = rec ? rec.patientName : "Paciente";
-  const plan = rec ? rec.plano : document.getElementById('soapPlano')?.value || "Uso contínuo conforme orientação clínica.";
-
-  const printArea = document.getElementById('printArea');
-  if (!printArea) return;
-
-  printArea.innerHTML = `
-    <div class="printable-prescription" style="font-family: 'Times New Roman', serif; max-width: 750px; margin: 0 auto; color: #000; line-height: 1.6;">
-      <!-- Cabeçalho Timbrado Oficial -->
-      <div style="border-bottom: 2px solid #0284c7; padding-bottom: 1rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <h2 style="font-size: 1.5rem; margin: 0; font-weight: bold; color: #0369a1;">DRA. IVANA CAROLINE SILVA BERGAMIN</h2>
-          <p style="margin: 0.2rem 0; font-size: 1rem; font-weight: bold;">MÉDICA • CRM/AC 3484</p>
-          <p style="margin: 0; font-size: 0.85rem; color: #475569;">Medicina de Família e Comunidade (COREME/FUNDHACRE) • Bacharel em Biomedicina</p>
-        </div>
-        <div style="text-align: right; font-size: 0.8rem; color: #64748b;">
-          <div>Rio Branco – Acre</div>
-          <div>USF Luana Freitas • CNES 7565534</div>
-        </div>
-      </div>
-
-      <!-- Identificação do Paciente -->
-      <div style="margin-bottom: 2rem; background: #f8fafc; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0;">
-        <p style="margin: 0; font-size: 1.1rem;"><strong>PACIENTE:</strong> ${patient.toUpperCase()}</p>
-        <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: #475569;">Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}</p>
-      </div>
-
-      <!-- Prescrição / Orientações -->
-      <div style="min-height: 380px; margin-bottom: 3rem;">
-        <h3 style="font-size: 1.15rem; text-decoration: underline; margin-bottom: 1.25rem;">PRESCRIÇÃO MÉDICA / CONDUTA CLÍNICA</h3>
-        <div style="font-size: 1.05rem; white-space: pre-line; line-height: 1.8;">
-          ${plan}
-        </div>
-      </div>
-
-      <!-- Assinatura Médica Oficial -->
-      <div style="border-top: 1px solid #000; width: 320px; margin: 3rem auto 1rem auto; text-align: center; padding-top: 0.5rem;">
-        <p style="margin: 0; font-weight: bold; font-size: 1rem;">Dra. Ivana Caroline Silva Bergamin</p>
-        <p style="margin: 0; font-size: 0.85rem;">Médica • CRM/AC 3484</p>
-        <p style="margin: 0; font-size: 0.75rem; color: #64748b;">Assinatura Digital / Carimbo Profissional</p>
-      </div>
-
-      <!-- Rodapé Regulatório CFM -->
-      <div style="font-size: 0.75rem; color: #64748b; text-align: center; margin-top: 2rem; border-top: 1px dashed #cbd5e1; padding-top: 0.5rem;">
-        Documento médico emitido em conformidade com a Resolução CFM nº 2.336/2023 e as Boas Práticas da Atenção Primária à Saúde.
-      </div>
-    </div>
-  `;
-
-  window.print();
+window.replyTriageWhatsApp = function(name, phone) {
+  document.getElementById('qmPatientName').value = name;
+  document.getElementById('qmPatientPhone').value = phone;
+  activeTemplate = 'mensagem';
+  document.querySelectorAll('#templatePicker .template-card-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.template === 'mensagem');
+  });
+  document.getElementById('qmExtraNote').value = 'Recebi a sua pré-triagem pelo site! Vamos agendar o melhor horário para avaliar com calma?';
+  updateQuickMessagePreview();
+  switchTab('tab-quickmsg');
 };
+
+/* ==========================================================================
+   INICIALIZAÇÃO
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  loadState();
+  initNavigation();
+  hydrateConfigUI();
+  renderQuickPatientChips();
+  initQuickMessageComposer();
+  renderSentHistory();
+  initAgendaEvents();
+  renderAgendaCards();
+  renderSoapHistory();
+  renderTriageInbox();
+  renderKPIs();
+});

@@ -3,15 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Médico Administrativo | Dra. Ivana Bergamin (CRM/AC 3484)</title>
+  <title>Painel Médico | Dra. Ivana Bergamin (CRM/AC 3484)</title>
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
-  
-  <!-- Fontes do Google -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Estilos Gerais e do Painel -->
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/admin.css">
@@ -19,7 +17,6 @@
   <!-- Autenticação Médica e Guarda de Rota -->
   <script src="js/auth.js"></script>
   <script>
-    // Protege o painel: redireciona para login.html se não houver sessão ativa
     AuthService.protectPage();
   </script>
 </head>
@@ -28,9 +25,9 @@
   <!-- ==========================================================================
        SIDEBAR LATERAL
        ========================================================================== -->
-  <aside class="admin-sidebar">
+  <aside class="admin-sidebar" id="adminSidebar">
     <div class="admin-sidebar-header">
-      <img src="assets/img/logo-crest.svg" alt="Monograma Dra. Ivana" class="admin-brand-crest">
+      <img src="assets/img/avatar-doctor.svg" alt="Dra. Ivana Bergamin" class="admin-brand-crest">
       <div>
         <div class="admin-sidebar-title">Dra. Ivana Bergamin</div>
         <div class="admin-sidebar-crm">CRM/AC 3484 • MFC</div>
@@ -39,453 +36,478 @@
 
     <ul class="admin-nav-list">
       <li class="admin-nav-item active">
-        <button data-tab="tab-dashboard">
-          <span>📊</span>
-          <span>Visão Geral</span>
+        <button data-tab="tab-quickmsg">
+          <span>⚡</span>
+          <span>Mensagem Rápida</span>
+          <span class="admin-nav-badge badge-wa">WA</span>
         </button>
       </li>
       <li class="admin-nav-item">
         <button data-tab="tab-agenda">
           <span>📅</span>
-          <span>Agenda de Consultas</span>
-          <span class="admin-nav-badge" id="navPendingBadge">1</span>
+          <span>Agenda & Retornos</span>
+          <span class="admin-nav-badge" id="navAgendaBadge">5</span>
         </button>
       </li>
       <li class="admin-nav-item">
         <button data-tab="tab-prontuarios">
           <span>🩺</span>
-          <span>Prontuários (SOAP)</span>
+          <span>Prontuário & Receitas</span>
         </button>
       </li>
       <li class="admin-nav-item">
         <button data-tab="tab-triagens">
           <span>🚨</span>
-          <span>Triagens & Pré-Consulta</span>
-        </button>
-      </li>
-      <li class="admin-nav-item">
-        <button data-tab="tab-instagram">
-          <span>📸</span>
-          <span>Canal @ivanaabergamin</span>
+          <span>Triagens</span>
+          <span class="admin-nav-badge" id="navTriageBadge" style="display: none;">0</span>
         </button>
       </li>
       <li class="admin-nav-item">
         <button data-tab="tab-config">
           <span>⚙️</span>
-          <span>Horários & Locais</span>
+          <span>Meu Contato & Agenda</span>
         </button>
       </li>
     </ul>
+
+    <div class="admin-sidebar-phone">
+      <span class="admin-sidebar-phone-label">WhatsApp Oficial da Dra. Ivana</span>
+      <span class="admin-sidebar-phone-num" id="sidebarDoctorPhone">+55 69 9383-7333</span>
+    </div>
 
     <div class="admin-sidebar-footer">
       <a href="index.html" class="btn btn-sm btn-outline" style="width: 100%; justify-content: center;">
         🌐 Ver Site Público
       </a>
       <button class="admin-logout-btn" onclick="AuthService.logout()">
-        🔒 Encerrar Sessão Médica
+        🔒 Sair do Painel
       </button>
     </div>
   </aside>
 
   <!-- ==========================================================================
-       CONTEÚDO PRINCIPAL (MAIN WRAPPER)
+       ÁREA PRINCIPAL
        ========================================================================== -->
   <div class="admin-main-wrapper">
-    <!-- Header Superior do Painel -->
     <header class="admin-top-header">
-      <div class="admin-header-greeting">
-        <h2>Painel de Gestão Médica</h2>
-        <p>Bem-vinda, Dra. Ivana Caroline Silva Bergamin • Residência COREME / FUNDHACRE</p>
+      <div class="admin-header-left">
+        <button class="admin-mobile-menu-btn" id="adminMobileMenuBtn" aria-label="Abrir menu">☰</button>
+        <div class="admin-header-greeting">
+          <h2>Central Clínica da Dra. Ivana</h2>
+          <p>Envie retornos, confirme dias marcados e gerencie sua agenda em segundos</p>
+        </div>
       </div>
 
       <div class="admin-header-actions">
-        <span class="admin-badge-session" id="adminSessionBadge" title="Sessão médica criptografada e autenticada">
-          <span style="display: inline-block; width: 7px; height: 7px; background-color: var(--admin-success); border-radius: 50%; box-shadow: 0 0 6px var(--admin-success);"></span>
-          Sessão Médica Conectada
-        </span>
-        <span class="admin-badge-usf">
-          USF Luana Freitas (ESF II)
-        </span>
-        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Alternar modo escuro/claro">
-          🌙
+        <button class="btn btn-sm btn-primary" onclick="openNewAppointmentModal()">
+          + Novo Horário / Retorno
         </button>
+        <span class="admin-badge-session">
+          <span style="width: 7px; height: 7px; background: var(--admin-success); border-radius: 50%; display: inline-block;"></span>
+          Conectada
+        </span>
+        <span class="admin-badge-usf">USF Luana Freitas</span>
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Alternar tema">🌙</button>
       </div>
     </header>
 
-    <!-- Área de Conteúdo / Abas -->
     <main class="admin-content-area">
-
-      <!-- ================= ABA 1: VISÃO GERAL (DASHBOARD) ================= -->
-      <section class="admin-view-tab active" id="tab-dashboard">
-        <!-- KPIs Principais -->
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-icon-box kpi-blue">📅</div>
-            <div>
-              <div class="kpi-val" id="kpiTotalAppts">5</div>
-              <div class="kpi-label">Consultas Agendadas</div>
-            </div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-icon-box kpi-teal">✓</div>
-            <div>
-              <div class="kpi-val" id="kpiConfirmedAppts">4</div>
-              <div class="kpi-label">Consultas Confirmadas</div>
-            </div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-icon-box kpi-amber">⏳</div>
-            <div>
-              <div class="kpi-val" id="kpiPendingAppts">1</div>
-              <div class="kpi-label">Aguardando Confirmação</div>
-            </div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-icon-box kpi-rose">🏥</div>
-            <div>
-              <div class="kpi-val" id="kpiUsfAppts">2</div>
-              <div class="kpi-label">Pacientes USF Luana Freitas</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Alertas de Prática e Próximos Pacientes -->
-        <div class="grid grid-2" style="margin-bottom: 2rem;">
-          <!-- Card de Plantão e Vínculos -->
-          <div class="card">
-            <h3 class="card-title" style="font-size: 1.15rem; margin-bottom: 0.75rem;">
-              🏛️ Escala e Vínculos Clínicos Ativos
-            </h3>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem;">
-              <div style="padding: 0.75rem; background: var(--admin-surface); border-radius: 8px; border-left: 3px solid var(--admin-accent);">
-                <strong>USF Luana Freitas (Rio Branco/AC)</strong>
-                <p style="margin: 0.15rem 0 0 0; color: var(--admin-text-muted); font-size: 0.8rem;">
-                  Atenção Primária à Saúde • Segunda a Sexta (40h) • CNES: 7565534
-                </p>
-              </div>
-              <div style="padding: 0.75rem; background: var(--admin-surface); border-radius: 8px; border-left: 3px solid var(--admin-teal);">
-                <strong>FUNDHACRE - Residência Médica em MFC</strong>
-                <p style="margin: 0.15rem 0 0 0; color: var(--admin-text-muted); font-size: 0.8rem;">
-                  Programa COREME / SESACRE • Seleção Pública 2025
-                </p>
-              </div>
-              <div style="padding: 0.75rem; background: var(--admin-surface); border-radius: 8px; border-left: 3px solid var(--admin-warning);">
-                <strong>Hospital Geral de Clínicas & Hospital do Rim</strong>
-                <p style="margin: 0.15rem 0 0 0; color: var(--admin-text-muted); font-size: 0.8rem;">
-                  Interconsultas e apoio clínico em nefrologia e medicina interna
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Ações Rápidas do Consultório -->
-          <div class="card">
-            <h3 class="card-title" style="font-size: 1.15rem; margin-bottom: 0.75rem;">
-              ⚡ Ações Rápidas da Médica
-            </h3>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-              <button class="btn btn-primary" onclick="switchAdminTab('tab-agenda')">
-                📋 Visualizar Agenda Completa de Pacientes
-              </button>
-              <button class="btn btn-secondary" onclick="printPrescription('novo')">
-                🖨️ Emitir Receituário Timbrado em Branco
-              </button>
-              <button class="btn btn-outline" onclick="switchAdminTab('tab-triagens')">
-                🚨 Revisar Fichas de Triagem do Site
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= ABA 2: AGENDA DE CONSULTAS ================= -->
-      <section class="admin-view-tab" id="tab-agenda">
-        <div class="admin-table-card">
-          <div class="admin-table-header">
-            <h3 class="admin-table-title">Agenda Diária de Atendimentos</h3>
-            
-            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-              <input type="text" id="searchPatientInput" class="form-input" style="max-width: 240px; padding: 0.5rem 0.85rem; font-size: 0.85rem;" placeholder="Buscar paciente ou CPF..." oninput="filterAppointments()">
-              
-              <select id="filterStatusSelect" class="form-select" style="max-width: 170px; padding: 0.5rem 0.85rem; font-size: 0.85rem;" onchange="filterAppointments()">
-                <option value="todos">Todos os Status</option>
-                <option value="Confirmada">Confirmadas</option>
-                <option value="Pendente">Pendentes</option>
-                <option value="Concluída">Concluídas</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="table-responsive">
-            <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Paciente</th>
-                  <th>Data & Horário</th>
-                  <th>Motivo / Queixa</th>
-                  <th>Status</th>
-                  <th>Ações Clínicas</th>
-                </tr>
-              </thead>
-              <tbody id="appointmentsTableBody">
-                <!-- Preenchido via js/admin.js -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= ABA 3: PRONTUÁRIOS (SOAP) ================= -->
-      <section class="admin-view-tab" id="tab-prontuarios">
-        <div class="admin-table-header" style="background: var(--admin-surface-card); border: 1px solid var(--admin-border); border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+      <!-- KPI Strip Resumida -->
+      <div class="kpi-strip">
+        <div class="kpi-mini">
+          <div class="kpi-icon-box kpi-blue">📅</div>
           <div>
-            <h3 class="admin-table-title">Histórico de Prontuários Eletrônicos (Método SOAP)</h3>
-            <p style="font-size: 0.85rem; color: var(--admin-text-muted); margin: 0.25rem 0 0 0;">
-              Registros clínicos detalhados no padrão da Medicina de Família e Comunidade (Subjetivo, Objetivo, Avaliação e Plano).
-            </p>
+            <div class="kpi-val" id="kpiTotalAppts">0</div>
+            <div class="kpi-lbl">Na Agenda</div>
           </div>
         </div>
-
-        <div id="recordsListContainer">
-          <!-- Preenchido via js/admin.js -->
+        <div class="kpi-mini">
+          <div class="kpi-icon-box kpi-purple">🔄</div>
+          <div>
+            <div class="kpi-val" id="kpiReturns">0</div>
+            <div class="kpi-lbl">Retornos Marcados</div>
+          </div>
         </div>
-      </section>
+        <div class="kpi-mini">
+          <div class="kpi-icon-box kpi-amber">⏳</div>
+          <div>
+            <div class="kpi-val" id="kpiPending">0</div>
+            <div class="kpi-lbl">Aguardando Confirmação</div>
+          </div>
+        </div>
+        <div class="kpi-mini">
+          <div class="kpi-icon-box kpi-green">💬</div>
+          <div>
+            <div class="kpi-val" id="kpiSentToday">0</div>
+            <div class="kpi-lbl">Mensagens Enviadas</div>
+          </div>
+        </div>
+      </div>
 
-      <!-- ================= ABA 4: TRIAGENS & PRÉ-CONSULTA ================= -->
-      <section class="admin-view-tab" id="tab-triagens">
-        <div class="card" style="margin-bottom: 1.5rem;">
-          <h3 class="card-title" style="font-size: 1.25rem;">Caixa de Entrada de Triagens Digitais</h3>
-          <p class="card-description">
-            Pacientes que preencheram a ficha de sintomas e acolhimento no site público antes do comparecimento à unidade.
-          </p>
-
-          <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
-            <div style="background: var(--admin-surface); padding: 1.25rem; border-radius: var(--radius-md); border-left: 4px solid var(--admin-success);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <strong>Maria Raimunda de Souza (62 anos)</strong>
-                <span class="badge-status status-confirmada">Rotina / Hipertensão</span>
-              </div>
-              <p style="font-size: 0.885rem; color: var(--admin-text-muted); margin: 0;">
-                "Preciso renovar receita de Losartana e mostrar os exames de sangue que a Dra. Ivana pediu no último mês."
-              </p>
-              <div style="font-size: 0.8rem; color: var(--admin-accent); margin-top: 0.5rem;">
-                Medicamentos: Losartana 50mg, Hidroclorotiazida 25mg • Alergias: Nenhuma
+      <!-- ======================================================================
+           ABA 1: CENTRAL DE MENSAGEM RÁPIDA (RETORNO, DIA MARCADO, MENSAGEM)
+           ====================================================================== -->
+      <section class="admin-view-tab active" id="tab-quickmsg">
+        <div class="quick-msg-grid">
+          <!-- COLUNA ESQUERDA: COMPOSITOR INTERATIVO -->
+          <div class="panel-card">
+            <div class="panel-card-header">
+              <div>
+                <h3 class="panel-card-title">⚡ Mensagem Rápida no WhatsApp</h3>
+                <p class="panel-card-sub">Escolha o tipo (retorno, dia marcado ou recado), defina data/hora e envie com 1 clique.</p>
               </div>
             </div>
 
-            <div style="background: var(--admin-surface); padding: 1.25rem; border-radius: var(--radius-md); border-left: 4px solid var(--admin-warning);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <strong>Carlos Eduardo Macedo (47 anos)</strong>
-                <span class="badge-status status-pendente">Avaliação Laboratorial</span>
+            <!-- 1. Tipo da Mensagem -->
+            <div class="admin-field">
+              <label>1. O que deseja enviar?</label>
+              <div class="template-picker-grid" id="templatePicker">
+                <button type="button" class="template-card-btn active" data-template="retorno">
+                  <span class="template-card-icon">🔄</span>
+                  <span class="template-card-label">Retorno</span>
+                </button>
+                <button type="button" class="template-card-btn" data-template="dia_marcado">
+                  <span class="template-card-icon">📅</span>
+                  <span class="template-card-label">Dia Marcado</span>
+                </button>
+                <button type="button" class="template-card-btn" data-template="mensagem">
+                  <span class="template-card-icon">💬</span>
+                  <span class="template-card-label">Mensagem</span>
+                </button>
+                <button type="button" class="template-card-btn" data-template="exames">
+                  <span class="template-card-icon">🧪</span>
+                  <span class="template-card-label">Exames</span>
+                </button>
+                <button type="button" class="template-card-btn" data-template="remarcar">
+                  <span class="template-card-icon">⏰</span>
+                  <span class="template-card-label">Remarcar</span>
+                </button>
               </div>
-              <p style="font-size: 0.885rem; color: var(--admin-text-muted); margin: 0;">
-                "Glicemia de jejum deu 138 mg/dL no laboratório e gostaria de iniciar acompanhamento para prevenir diabetes."
-              </p>
-              <div style="font-size: 0.8rem; color: var(--admin-accent); margin-top: 0.5rem;">
-                Medicamentos: Nenhum • Alergias: Dipirona
+            </div>
+
+            <!-- 2. Selecionar Paciente da Agenda -->
+            <div class="admin-field">
+              <label>2. Selecionar paciente da agenda (ou digitar abaixo)</label>
+              <div class="quick-chips-row" id="quickPatientChips"></div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="admin-field">
+                <label for="qmPatientName">Nome do Paciente</label>
+                <input type="text" id="qmPatientName" class="admin-input" placeholder="Ex: Maria Raimunda">
               </div>
+              <div class="admin-field">
+                <label for="qmPatientPhone">WhatsApp do Paciente (com DDD)</label>
+                <input type="tel" id="qmPatientPhone" class="admin-input" placeholder="Ex: +55 69 9383-7333">
+              </div>
+            </div>
+
+            <!-- 3. Dia Marcado, Horário & Local -->
+            <div id="qmScheduleFields">
+              <div class="form-row-3">
+                <div class="admin-field">
+                  <label for="qmDate">Dia Marcado / Retorno</label>
+                  <input type="date" id="qmDate" class="admin-input">
+                </div>
+                <div class="admin-field">
+                  <label for="qmTime">Horário</label>
+                  <input type="time" id="qmTime" class="admin-input" value="09:00">
+                </div>
+                <div class="admin-field">
+                  <label for="qmLocation">Local / Modalidade</label>
+                  <select id="qmLocation" class="admin-select">
+                    <option value="USF Luana Freitas (ESF II)">USF Luana Freitas (ESF II)</option>
+                    <option value="Consultório Clínico">Consultório Clínico</option>
+                    <option value="Telemedicina (Online)">Telemedicina (Online)</option>
+                    <option value="FUNDHACRE / Ambulatório">FUNDHACRE / Ambulatório</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Atalhos Rápidos de Data & Horário -->
+              <div class="admin-field">
+                <label>Atalhos rápidos de retorno & horário</label>
+                <div class="quick-chips-row" style="margin-bottom: 0.45rem;">
+                  <button type="button" class="quick-chip" onclick="setQuickDateOffset(1)">Amanhã</button>
+                  <button type="button" class="quick-chip" onclick="setQuickDateOffset(7)">+7 dias</button>
+                  <button type="button" class="quick-chip" onclick="setQuickDateOffset(15)">+15 dias (Retorno)</button>
+                  <button type="button" class="quick-chip" onclick="setQuickDateOffset(30)">+30 dias (Retorno)</button>
+                </div>
+                <div class="quick-chips-row" id="quickTimeChips">
+                  <button type="button" class="quick-chip" data-time="08:00">08:00</button>
+                  <button type="button" class="quick-chip" data-time="08:30">08:30</button>
+                  <button type="button" class="quick-chip active" data-time="09:00">09:00</button>
+                  <button type="button" class="quick-chip" data-time="10:00">10:00</button>
+                  <button type="button" class="quick-chip" data-time="14:00">14:00</button>
+                  <button type="button" class="quick-chip" data-time="15:00">15:00</button>
+                  <button type="button" class="quick-chip" data-time="16:00">16:00</button>
+                  <button type="button" class="quick-chip" data-time="17:00">17:00</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Mensagem / Observação Personalizada -->
+            <div class="admin-field">
+              <label for="qmExtraNote" id="qmExtraNoteLabel">Orientações adicionais (ex: exames, jejum, receita)</label>
+              <textarea id="qmExtraNote" class="admin-textarea" rows="3" placeholder="Ex: Por favor, trazer os exames de sangue recentes e a lista das medicações em uso."></textarea>
+            </div>
+
+            <!-- 5. Ações -->
+            <div class="quick-actions-bar">
+              <button type="button" class="btn-wa-primary" onclick="dispatchQuickWhatsApp(false)">
+                <span>💬</span>
+                <span>Enviar no WhatsApp</span>
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" onclick="dispatchQuickWhatsApp(true)">
+                📅 Enviar + Salvar na Agenda
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="copyQuickMessage()">
+                📋 Copiar Texto
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="sendTestToDoctorPhone()" title="Enviar prévia para o WhatsApp da Dra. Ivana (+55 69 9383-7333)">
+                📲 Testar no Meu WhatsApp
+              </button>
+            </div>
+          </div>
+
+          <!-- COLUNA DIREITA: PRÉVIA AO VIVO DO WHATSAPP + HISTÓRICO -->
+          <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <div class="wa-preview-shell">
+              <div class="wa-preview-header">
+                <div class="wa-avatar-dot" id="waPreviewInitials">PA</div>
+                <div>
+                  <div class="wa-preview-name" id="waPreviewName">Selecione um paciente</div>
+                  <div class="wa-preview-status" id="waPreviewPhone">Prévia ao vivo do WhatsApp</div>
+                </div>
+              </div>
+              <div class="wa-preview-chat">
+                <div class="wa-bubble" id="waPreviewBubble">
+                  Carregando prévia da mensagem...
+                </div>
+              </div>
+              <div class="wa-preview-footer">
+                <span>Assinatura: Dra. Ivana • CRM/AC 3484</span>
+                <span id="waPreviewCharCount">0 caracteres</span>
+              </div>
+            </div>
+
+            <div class="panel-card" style="padding: 1.2rem;">
+              <div class="panel-card-header" style="margin-bottom: 0.85rem;">
+                <h4 class="panel-card-title" style="font-size: 0.92rem;">🕒 Histórico de Envios Rápidos</h4>
+                <button type="button" class="btn-mini" onclick="clearSentHistory()">Limpar</button>
+              </div>
+              <div class="sent-history-list" id="sentHistoryList"></div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ================= ABA 5: INSTAGRAM @ivanaabergamin ================= -->
-      <section class="admin-view-tab" id="tab-instagram">
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <!-- ======================================================================
+           ABA 2: AGENDA & RETORNOS
+           ====================================================================== -->
+      <section class="admin-view-tab" id="tab-agenda">
+        <div class="agenda-toolbar">
+          <div class="agenda-filter-pills" id="agendaFilterPills">
+            <button type="button" class="quick-chip active" data-filter="all">Todos</button>
+            <button type="button" class="quick-chip" data-filter="Retorno Marcado">🔄 Retornos</button>
+            <button type="button" class="quick-chip" data-filter="Confirmada">✓ Confirmadas</button>
+            <button type="button" class="quick-chip" data-filter="Pendente">⏳ Pendentes</button>
+            <button type="button" class="quick-chip" data-filter="Concluída">🏁 Concluídas</button>
+          </div>
+          <div style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="agendaSearchInput" class="admin-input" placeholder="🔎 Buscar paciente ou motivo..." style="width: 240px;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="openNewAppointmentModal()">
+              + Marcar Dia / Retorno
+            </button>
+          </div>
+        </div>
+
+        <div class="agenda-cards-list" id="agendaCardsList"></div>
+      </section>
+
+      <!-- ======================================================================
+           ABA 3: PRONTUÁRIO & RECEITAS (SOAP)
+           ====================================================================== -->
+      <section class="admin-view-tab" id="tab-prontuarios">
+        <div class="panel-card">
+          <div class="panel-card-header">
             <div>
-              <h3 class="card-title" style="font-size: 1.25rem; margin: 0;">Gestão do Canal Educativo @ivanaabergamin</h3>
-              <p class="card-description" style="margin-top: 0.25rem;">
-                Rascunhe novos posts de orientação médica e monitore o alcance das publicações.
-              </p>
+              <h3 class="panel-card-title">🩺 Prontuários Eletrônicos (SOAP) & Receituário</h3>
+              <p class="panel-card-sub">Registre evoluções clínicas e imprima receitas timbradas com CRM/AC 3484.</p>
             </div>
-            <a href="https://www.instagram.com/ivanaabergamin/" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
-              Abrir Perfil Oficial ↗
+            <button class="btn btn-primary btn-sm" onclick="openSoapModal('')">
+              + Nova Evolução / Receita
+            </button>
+          </div>
+          <div id="soapHistoryContainer" style="display: flex; flex-direction: column; gap: 0.85rem;"></div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           ABA 4: TRIAGENS RECEBIDAS DO SITE
+           ====================================================================== -->
+      <section class="admin-view-tab" id="tab-triagens">
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div>
+              <h3 class="panel-card-title">🚨 Triagens & Pré-Consultas</h3>
+              <p class="panel-card-sub">Respostas enviadas pelos pacientes pelo portal público.</p>
+            </div>
+          </div>
+          <div id="triageInboxContainer" style="display: flex; flex-direction: column; gap: 0.85rem;"></div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           ABA 5: MEU CONTATO & HORÁRIOS
+           ====================================================================== -->
+      <section class="admin-view-tab" id="tab-config">
+        <div class="panel-card" style="max-width: 720px;">
+          <div class="panel-card-header">
+            <div>
+              <h3 class="panel-card-title">⚙️ Contato Oficial & Assinatura do WhatsApp</h3>
+              <p class="panel-card-sub">Configure seu número oficial, horários de atendimento e assinatura das mensagens.</p>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="admin-field">
+              <label for="cfgDoctorPhone">WhatsApp Oficial da Dra. Ivana</label>
+              <input type="tel" id="cfgDoctorPhone" class="admin-input" value="+55 69 9383-7333">
+            </div>
+            <div class="admin-field">
+              <label for="cfgDoctorSignature">Assinatura Padrão nas Mensagens</label>
+              <input type="text" id="cfgDoctorSignature" class="admin-input" value="Dra. Ivana Bergamin • Médica (CRM/AC 3484)">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="admin-field">
+              <label for="cfgHoursMorning">Turno Manhã (USF / Consultório)</label>
+              <input type="text" id="cfgHoursMorning" class="admin-input" value="07:30 às 12:00 (Seg a Sex)">
+            </div>
+            <div class="admin-field">
+              <label for="cfgHoursAfternoon">Turno Tarde (Retornos / Telemedicina)</label>
+              <input type="text" id="cfgHoursAfternoon" class="admin-input" value="14:00 às 18:00 (Seg a Sex)">
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" onclick="saveDoctorConfig()">
+              💾 Salvar Configurações
+            </button>
+            <a href="https://api.whatsapp.com/send?phone=556993837333" target="_blank" rel="noopener noreferrer" class="btn-wa-primary" style="text-decoration: none;">
+              💬 Abrir Meu WhatsApp (+55 69 9383-7333)
             </a>
           </div>
-
-          <div class="grid grid-2">
-            <div>
-              <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.75rem;">Novo Post Educativo</h4>
-              <div class="form-group">
-                <label class="form-label">Tema da Publicação</label>
-                <input type="text" class="form-input" placeholder="Ex: Por que fazer o exame de preventivo no tempo certo?">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Legenda Explicativa</label>
-                <textarea class="form-textarea" rows="4" placeholder="Escreva o texto educativo com linguagem simples, acolhedora e ética médica segundo o CFM..."></textarea>
-              </div>
-              <button class="btn btn-secondary" onclick="showToast('Rascunho de post salvo no banco de conteúdos!', 'success')">
-                Salvar Rascunho de Conteúdo
-              </button>
-            </div>
-
-            <div>
-              <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.75rem;">Métricas de Engajamento em Saúde</h4>
-              <div style="background: var(--admin-surface); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--admin-border); display: flex; flex-direction: column; gap: 1rem;">
-                <div style="display: flex; justify-content: space-between;">
-                  <span style="color: var(--admin-text-muted);">Visualizações Totais no Mês:</span>
-                  <strong>+12.450</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                  <span style="color: var(--admin-text-muted);">Dúvidas Respondidas nos Comentários:</span>
-                  <strong>84</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                  <span style="color: var(--admin-text-muted);">Tema com Maior Alcance:</span>
-                  <strong style="color: var(--admin-accent);">Hematologia & Interpretação de Exames</strong>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
-
-      <!-- ================= ABA 6: HORÁRIOS & CONFIGURAÇÕES ================= -->
-      <section class="admin-view-tab" id="tab-config">
-        <div class="card" style="max-width: 800px;">
-          <h3 class="card-title" style="font-size: 1.25rem;">Configurações de Agenda & Vínculos</h3>
-          <p class="card-description" style="margin-bottom: 1.5rem;">
-            Ajuste os horários liberados para agendamento dos pacientes no portal público.
-          </p>
-
-          <div class="grid grid-2">
-            <div class="form-group">
-              <label class="form-label">Dias de Atendimento na USF Luana Freitas</label>
-              <input type="text" class="form-input" value="Segunda a Quinta-feira (08:00 às 17:00)">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Turno de Visitas Domiciliares</label>
-              <input type="text" class="form-input" value="Sexta-feira (Manhã e Tarde)">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Duração Padrão de Consulta (min)</label>
-              <input type="number" class="form-input" value="45">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Telefone WhatsApp para Confirmação</label>
-              <input type="text" class="form-input" value="(68) 99999-9999">
-            </div>
-          </div>
-
-          <button class="btn btn-primary" onclick="showToast('Configurações da agenda atualizadas com sucesso!', 'success')">
-            Salvar Alterações de Horário
-          </button>
-        </div>
-      </section>
-
     </main>
   </div>
 
   <!-- ==========================================================================
-       MODAL DE PRONTUÁRIO ELETRÔNICO (MÉTODO SOAP)
+       MODAL: NOVO AGENDAMENTO / MARCAR RETORNO
        ========================================================================== -->
-  <div class="modal-backdrop" id="soapModal">
-    <div class="modal-content" style="max-width: 860px;">
-      <button class="modal-close-btn" onclick="closeSoapModal()">×</button>
-      
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; border-bottom: 1px solid var(--admin-border); padding-bottom: 1rem;">
+  <div class="admin-modal-overlay" id="newApptModal">
+    <div class="admin-modal-box" style="max-width: 560px;">
+      <div class="panel-card-header">
+        <h3 class="panel-card-title">📅 Novo Agendamento / Marcar Retorno</h3>
+        <button class="btn-mini" onclick="closeNewAppointmentModal()">✕</button>
+      </div>
+      <form id="newApptForm">
+        <div class="form-row-2">
+          <div class="admin-field">
+            <label for="naName">Nome do Paciente *</label>
+            <input type="text" id="naName" class="admin-input" required placeholder="Ex: Ana Paula Silva">
+          </div>
+          <div class="admin-field">
+            <label for="naPhone">WhatsApp (com DDD) *</label>
+            <input type="tel" id="naPhone" class="admin-input" required placeholder="Ex: (69) 9383-7333">
+          </div>
+        </div>
+        <div class="form-row-3">
+          <div class="admin-field">
+            <label for="naType">Tipo</label>
+            <select id="naType" class="admin-select">
+              <option value="Retorno Marcado">🔄 Retorno</option>
+              <option value="Confirmada">📅 Consulta Confirmada</option>
+              <option value="Pendente">⏳ Aguardando Confirmação</option>
+            </select>
+          </div>
+          <div class="admin-field">
+            <label for="naDate">Data *</label>
+            <input type="date" id="naDate" class="admin-input" required>
+          </div>
+          <div class="admin-field">
+            <label for="naTime">Horário *</label>
+            <input type="time" id="naTime" class="admin-input" required value="09:00">
+          </div>
+        </div>
+        <div class="admin-field">
+          <label for="naModality">Local / Modalidade</label>
+          <select id="naModality" class="admin-select">
+            <option value="USF Luana Freitas (ESF II)">USF Luana Freitas (ESF II)</option>
+            <option value="Consultório Clínico">Consultório Clínico</option>
+            <option value="Telemedicina (Online)">Telemedicina (Online)</option>
+            <option value="FUNDHACRE / Ambulatório">FUNDHACRE / Ambulatório</option>
+          </select>
+        </div>
+        <div class="admin-field">
+          <label for="naReason">Motivo / Lembrete</label>
+          <textarea id="naReason" class="admin-textarea" rows="2" placeholder="Ex: Retorno para avaliar exames de rotina e ajuste de receita."></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 1rem;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="closeNewAppointmentModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">✓ Salvar na Agenda</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: EVOLUÇÃO CLÍNICA SOAP & RECEITUÁRIO TIMBRADO
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="soapModal">
+    <div class="admin-modal-box">
+      <div class="panel-card-header">
         <div>
-          <span style="font-size: 0.75rem; font-weight: 800; color: var(--admin-accent); text-transform: uppercase;">Atendimento Clínico • Atenção Básica</span>
-          <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--admin-text-main); margin: 0.2rem 0;" id="soapPatientName">
-            Nome do Paciente
-          </h3>
-          <p style="font-size: 0.85rem; color: var(--admin-text-muted); margin: 0;" id="soapPatientMeta">
-            CPF: 000.000.000-00 • USF Luana Freitas
-          </p>
+          <h3 class="panel-card-title">🩺 Evolução Clínica (SOAP) & Receituário</h3>
+          <p class="panel-card-sub" id="soapPatientSubtitle">Paciente</p>
         </div>
-        <span style="font-size: 0.8rem; padding: 0.35rem 0.75rem; background: rgba(2, 132, 199, 0.15); color: var(--admin-accent); border-radius: 9999px; font-weight: 800;">
-          Dra. Ivana Bergamin (CRM/AC 3484)
-        </span>
+        <button class="btn-mini" onclick="closeSoapModal()">✕</button>
       </div>
-
-      <div class="soap-container" style="margin-bottom: 1.5rem;">
-        <!-- S: Subjetivo -->
+      <input type="hidden" id="soapApptId">
+      <div class="admin-field" id="soapManualNameGroup" style="display: none;">
+        <label for="soapManualPatientName">Nome do Paciente</label>
+        <input type="text" id="soapManualPatientName" class="admin-input" placeholder="Nome completo do paciente">
+      </div>
+      <div class="soap-grid">
         <div class="soap-box">
-          <div class="soap-title soap-s">
-            <span>S</span> Subjetivo (Queixa & História Atual)
-          </div>
-          <textarea class="form-textarea" id="soapSubjetivo" rows="4"></textarea>
+          <div class="soap-title"><span class="soap-badge soap-s">S</span> Subjetivo (Queixa)</div>
+          <textarea class="admin-textarea" id="soapSubjetivo" rows="3" placeholder="Queixa principal e relato..."></textarea>
         </div>
-
-        <!-- O: Objetivo -->
         <div class="soap-box">
-          <div class="soap-title soap-o">
-            <span>O</span> Objetivo (Sinais Vitais & Exame Físico)
-          </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem;">
-            <div>
-              <label>PA (mmHg):</label>
-              <input type="text" class="form-input" id="soapPa" value="120/80">
-            </div>
-            <div>
-              <label>FC (bpm):</label>
-              <input type="text" class="form-input" id="soapFc" value="72">
-            </div>
-            <div>
-              <label>Glicemia (mg/dL):</label>
-              <input type="text" class="form-input" id="soapGlicose" value="95">
-            </div>
-            <div>
-              <label>Peso (kg):</label>
-              <input type="number" class="form-input" id="soapPeso" value="70">
-            </div>
-            <div>
-              <label>Altura (cm):</label>
-              <input type="number" class="form-input" id="soapAltura" value="165">
-            </div>
-            <div>
-              <label>IMC Calculado:</label>
-              <div id="soapImc" style="padding: 0.5rem; background: var(--admin-surface); font-weight: 800; color: var(--admin-teal); border-radius: 6px;">25.7 kg/m²</div>
-            </div>
-          </div>
+          <div class="soap-title"><span class="soap-badge soap-o">O</span> Objetivo (Exame / Sinais)</div>
+          <textarea class="admin-textarea" id="soapObjetivo" rows="3" placeholder="PA, FC, SatO2, exame físico e exames..."></textarea>
         </div>
-
-        <!-- A: Avaliação -->
         <div class="soap-box">
-          <div class="soap-title soap-a">
-            <span>A</span> Avaliação / Diagnóstico (CIAP-2 & CID-10)
-          </div>
-          <textarea class="form-textarea" id="soapAvaliacao" rows="3"></textarea>
+          <div class="soap-title"><span class="soap-badge soap-a">A</span> Avaliação / Hipótese</div>
+          <textarea class="admin-textarea" id="soapAvaliacao" rows="3" placeholder="Hipótese diagnóstica..."></textarea>
         </div>
-
-        <!-- P: Plano -->
         <div class="soap-box">
-          <div class="soap-title soap-p">
-            <span>P</span> Plano Terapêutico & Solicitação de Exames
-          </div>
-          <textarea class="form-textarea" id="soapPlano" rows="4"></textarea>
+          <div class="soap-title"><span class="soap-badge soap-p">P</span> Plano & Prescrição</div>
+          <textarea class="admin-textarea" id="soapPlano" rows="3" placeholder="Medicações, orientações e retorno..."></textarea>
         </div>
       </div>
-
-      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--admin-border); padding-top: 1.25rem;">
-        <button type="button" class="btn btn-outline" onclick="closeSoapModal()">
-          Cancelar
-        </button>
-
-        <div style="display: flex; gap: 0.75rem;">
-          <button type="button" class="btn btn-secondary" onclick="printPrescription()">
-            🖨️ Imprimir Receituário Timbrado
-          </button>
-          <button type="button" class="btn btn-primary" onclick="saveSoapRecord()">
-            ✓ Concluir Consulta & Salvar Prontuário
-          </button>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--admin-border);">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeSoapModal()">Cancelar</button>
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="printPrescription()">🖨️ Imprimir Receita</button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="saveSoapRecord()">✓ Salvar Prontuário</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Área Oculta para Impressão de Receitas Oficiais -->
   <div id="printArea" style="display: none;"></div>
 
-  <!-- Scripts -->
   <script src="js/main.js"></script>
   <script src="js/admin.js"></script>
 </body>
