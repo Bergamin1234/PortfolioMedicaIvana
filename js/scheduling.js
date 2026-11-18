@@ -126,7 +126,7 @@ function renderStep(step) {
 
             <div class="form-group">
               <label class="form-label" for="ptPhone">WhatsApp / Telefone com DDD *</label>
-              <input type="tel" class="form-input" id="ptPhone" required placeholder="Ex: (68) 99999-9999" value="${appointmentState.patientPhone}">
+              <input type="tel" class="form-input" id="ptPhone" required placeholder="Ex: (69) 9383-7333" value="${appointmentState.patientPhone}">
             </div>
 
             <div class="form-group">
@@ -217,7 +217,7 @@ function renderStep(step) {
         </div>
 
         <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem;">
-          <a href="https://api.whatsapp.com/send?phone=5568999999999&text=${whatsappText}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-lg">
+          <a href="https://api.whatsapp.com/send?phone=556993837333&text=${whatsappText}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-lg">
             📱 Confirmar via WhatsApp da Equipe
           </a>
           <button class="btn btn-outline btn-lg" onclick="downloadIcsFile()">
