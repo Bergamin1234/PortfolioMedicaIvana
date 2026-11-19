@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   initFaqAccordion();
   initModals();
+  initProjectsFilter();
 });
 
 /* ==========================================================================
@@ -222,3 +223,78 @@ window.showToast = function(message, type = 'info') {
     setTimeout(() => toast.remove(), 300);
   }, 4000);
 };
+
+/* ==========================================================================
+   CONSULTE O CRM E CRB | CÓPIA DE DADOS E FILTRO DE PROJETOS
+   ========================================================================== */
+window.copyRegistryData = function(type) {
+  let text = '';
+  let label = '';
+  if (type === 'crm') {
+    text = `Dra. Ivana Caroline Silva Bergamin\nRegistro: CRM/AC 3484\nConselho: Conselho Regional de Medicina do Estado do Acre (CRM-AC)\nÓrgão Federal: Conselho Federal de Medicina (CFM)\nQualificação: Medicina de Família e Comunidade (MFC - COREME/FUNDHACRE)\nSituação: Registro Ativo e Regular`;
+    label = 'CRM/AC 3484 (Conselho Regional de Medicina)';
+  } else if (type === 'crb') {
+    text = `Dra. Ivana Caroline Silva Bergamin\nFormação: Bacharela em Biomedicina\nInstituição: Centro Universitário São Lucas (UniSL - Rondônia)\nConselho: Conselho Regional de Biomedicina (CRBM 4ª Região)\nÓrgão Federal: Conselho Federal de Biomedicina (CFBM)\nHabilitações: Patologia Clínica, Hematologia, Micologia & Diagnóstico Laboratorial\nSituação: Habilitação Profissional Reconhecida`;
+    label = 'CRB/CRBM (Conselho Regional de Biomedicina)';
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast(`📋 Dados oficiais do <strong>${label}</strong> copiados para a área de transferência!`, 'success');
+    }).catch(() => {
+      fallbackCopy(text, label);
+    });
+  } else {
+    fallbackCopy(text, label);
+  }
+};
+
+function fallbackCopy(text, label) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    document.execCommand('copy');
+    showToast(`📋 Dados oficiais do <strong>${label}</strong> copiados!`, 'success');
+  } catch (err) {
+    showToast(`Dados: ${label}`, 'info');
+  }
+  document.body.removeChild(textArea);
+}
+
+function initProjectsFilter() {
+  const filterBtns = document.querySelectorAll('.project-filter-btn');
+  const projectCards = document.querySelectorAll('.project-card');
+
+  if (!filterBtns.length || !projectCards.length) return;
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filter = btn.getAttribute('data-filter');
+
+      projectCards.forEach(card => {
+        const category = card.getAttribute('data-category');
+        if (filter === 'todos' || category === filter || card.classList.contains(filter)) {
+          card.style.display = 'flex';
+          requestAnimationFrame(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          });
+        } else {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(10px)';
+          setTimeout(() => {
+            card.style.display = 'none';
+          }, 200);
+        }
+      });
+    });
+  });
+}

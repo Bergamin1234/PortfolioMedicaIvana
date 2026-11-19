@@ -73,7 +73,14 @@ def test_html_references():
     assert "FUNDHACRE" in html
     assert "USF Luana Freitas" in html
     assert "@ivanaabergamin" in html
-    print("✓ Conteúdo HTML validado com dados institucionais da Dra. Ivana.")
+    assert "Conselho Regional de Medicina" in html
+    assert "Conselho Regional de Biomedicina" in html
+    assert "Consulte o CRM e CRB" in html
+    assert "Projetos e Feitos da Dra. Ivana Bergamin" in html
+    assert "https://portal.cfm.org.br/busca-medicos/" in html
+    assert "https://crbm4.gov.br/" in html
+    assert "copyRegistryData" in html
+    print("✓ Conteúdo HTML validado com dados institucionais, CRM, CRB e Projetos da Dra. Ivana.")
 
 if __name__ == '__main__':
     print("Iniciando testes de integridade...")
